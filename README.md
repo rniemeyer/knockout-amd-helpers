@@ -33,7 +33,7 @@ Once the `module` binding loads an AMD module, there are three scenarios for how
 
 1. **constructor function** - If the module returns a function, then it is assumed that it is a constructor function and a new instance is used as the data.
 
-2. **object returned** If the module returns an object directly, then the binding will look for an initializer function (called `initialize` by default) and:
+2. **object returned** - If the module returns an object directly, then the binding will look for an initializer function (called `initialize` by default) and:
 
     a. if there is no initializer or the function does not return a value, then the data will be used directly.
   
@@ -63,11 +63,14 @@ In this example, it will follow the same logic as the previous example, but it w
     
 ###Example with all options   
     
-    <div data-bind="module: { name: 'one", data: initialData, template: 'oneTmpl',
+    <div data-bind="module: { name: 'one', data: initialData, template: 'oneTmpl',
                               initializer: 'createItem'', afterRender: myAfterRender }"></div>
     
 This example includes a number of options options that can be passed to the `module` binding. In this case, the template is overriden to use `oneTmpl`, a custom initializer function is used, and an `afterRender` function is passed on to the template binding.
 
+###Dynamically binding against a module
+
+The `module` binding supports binding against an observable or passing an observable for the `name`, `template`. and `data` options. The content will be appropriately updated based on the new values. This allows you to dynamically bind an area to a module that is updated as the user interacts with your site.
 
 ###module binding options
 
