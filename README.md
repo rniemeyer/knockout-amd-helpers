@@ -31,9 +31,10 @@ This plugin also creates a `module` binding that provides a number of ways to bi
 
 Once the `module` binding loads an AMD module, there are three scenarios for how it determines the actual data to bind against:
 
-1. If the module returns a function, then it is assumed that it is a constructor function and a new instance is used as the data.
+1. **constructor function** - If the module returns a function, then it is assumed that it is a constructor function and a new instance is used as the data.
 
-2. If the module returns an object directly, then the binding will look for an initializer function (called `initialize` by default) and:
+2. **object returned** If the module returns an object directly, then the binding will look for an initializer function (called `initialize` by default) and:
+
     a. if there is no initializer or the function does not return a value, then the data will be used directly.
   
     b. if the initializer function returns a value, then it will be used as the data.
