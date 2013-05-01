@@ -6,18 +6,18 @@ var require = window.require || window.curl,
     //call a constructor function with a variable number of arguments
     construct = function(Constructor, args) {
         var instance,
-            wrapper = function() {
+            Wrapper = function() {
                 return Constructor.apply(this, args);
             };
 
-        wrapper.prototype = Constructor.prototype;
-        instance = new wrapper();
+        Wrapper.prototype = Constructor.prototype;
+        instance = new Wrapper();
         instance.constructor = Constructor;
 
         return instance;
     };
 
-//an AMD helper binding that allows declaritive module loading/binding
+//an AMD helper binding that allows declarative module loading/binding
 ko.bindingHandlers.module = {
     init: function(element, valueAccessor, allBindingsAccessor, data, context) {
         var value = valueAccessor(),
