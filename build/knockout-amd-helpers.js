@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.1.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license %>
+// knockout-amd-helpers 0.1.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 var require = window.require || window.curl,

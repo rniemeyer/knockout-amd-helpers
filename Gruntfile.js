@@ -7,7 +7,7 @@ module.exports = function(grunt) {
             options: {
                 separator: '\n\n',
                 stripBanners: true,
-                banner: '// <%= pkg.name %> <%= pkg.version %> | (c) <%= grunt.template.today("yyyy") %> Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license %>\n'
+                banner: '// <%= pkg.name %> <%= pkg.version %> | (c) <%= grunt.template.today("yyyy") %> Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license\n'
             },
             dist: {
                 src: ['src/intro.txt', 'src/*.js', 'src/outro.txt'],
@@ -17,7 +17,7 @@ module.exports = function(grunt) {
         uglify: {
             options: {
                 stripBanners: true,
-                banner: '// <%= pkg.name %> <%= pkg.version %> | (c) <%= grunt.template.today("yyyy") %> Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license %>\n'
+                banner: '// <%= pkg.name %> <%= pkg.version %> | (c) <%= grunt.template.today("yyyy") %> Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license\n'
             },
             build: {
                 src: 'build/<%= pkg.name %>.js',
