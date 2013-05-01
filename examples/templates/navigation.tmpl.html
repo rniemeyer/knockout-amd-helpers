@@ -1,0 +1,9 @@
+<div class="large-12 columns">
+    <div class="nav-bar right">
+        <ul class="button-group" data-bind="foreach: articles">
+            <li><a href="#" class="button" data-bind="text: $data, click: $root.currentArticle"></a></li>
+        </ul>
+    </div>
+    <h1 data-bind="template: 'header'"></h1>
+    <hr />
+</div>

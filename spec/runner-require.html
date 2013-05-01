@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+    <title>knockout-amd-helpers specs</title>
+
+    <!-- Include the Jasmine assets for running in an HTML page. -->
+    <link rel="stylesheet" type="text/css" href="lib/jasmine.css">
+    <script type="text/javascript" src="lib/jasmine.js"></script>
+    <script type="text/javascript" src="lib/jasmine-html.js"></script>
+
+    <script type="text/javascript">
+        var require = {
+            paths: {
+                "knockout": "../ext/knockout-2.2.1.debug",
+                "knockout-amd-helpers": "../build/knockout-amd-helpers",
+                "text": "../ext/require/text"
+            }
+        };
+    </script>
+    <script type="text/javascript" src="../ext/require/require.js"></script>
+</head>
+
+<body>
+    <script type="text/javascript">
+        require(["knockout", "knockout-amd-helpers", "amdBindings.spec", "amdTemplateEngine.spec", "text"], function() {
+            jasmine.getEnv().addReporter(new jasmine.HtmlReporter());
+            jasmine.getEnv().execute();
+        });
+    </script>
+</body>
+
+</html>
