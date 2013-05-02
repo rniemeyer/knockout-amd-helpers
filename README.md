@@ -1,4 +1,4 @@
- #knockout-amd-helpers
+#knockout-amd-helpers
 
 ##What is the point of this library?
 
