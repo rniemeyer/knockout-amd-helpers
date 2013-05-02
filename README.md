@@ -1,8 +1,8 @@
-#knockout-amd-helpers
+ #knockout-amd-helpers
 
 ##What is the point of this library?
 
-This plugin is designed to provide a lightweight way to make working with AMD modules in Knockout.js easier. It provides two key features:
+This plugin is designed to be a lightweight and flexible solution to working with AMD modules in Knockout.js. It provides two key features:
 
 1- Augments the default template engine to allow it to load **external templates** using the AMD loader's text plugin. This lets you create your templates in individual HTML files and pull them in as needed by name.
 
