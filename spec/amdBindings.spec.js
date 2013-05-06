@@ -9,11 +9,20 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
         document.body.appendChild(sandbox);
 
         //helper to apply bindings, wait, and check result
-        var applyBindings = function(bindingString, data, children, callback) {
+        var applyBindings = function(bindingString, data, children, callback, containerless) {
             runs(function() {
                 container = document.createElement("div");
-                container.setAttribute("data-bind", bindingString);
-                container.innerHTML = children || "";
+                if (!containerless) {
+                    container.setAttribute("data-bind", bindingString);
+                    container.innerHTML = children || "";
+                }
+                else {
+                    var opening = document.createComment("ko " + bindingString),
+                       closing = document.createComment("/ko");
+
+                    container.appendChild(opening);
+                    container.appendChild(closing);
+                }
 
                 sandbox.appendChild(container);
 
@@ -74,6 +83,14 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                             expect(container.innerText).toEqual("has-constructor: Ted Jones");
                         });
                     });
+                });
+
+                describe("using s containerless binding", function() {
+                   it("should respect the containerless binding syntax", function() {
+                       applyBindings("module: 'has-constructor'", {}, null, function() {
+                           expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                       }, true);
+                   });
                 });
             });
 
@@ -184,12 +201,20 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
         });
 
         describe("passing options object", function() {
-            describe("when suppliying an afterRender function", function() {
+            describe("when supplying an afterRender function", function() {
                 it("should call the afterRender function", function() {
                     var afterRenderCallback = jasmine.createSpy();
                     applyBindings("module: { name: 'has-constructor', afterRender: mycallback }", { mycallback: afterRenderCallback }, "<span></span>", function() {
                         expect(afterRenderCallback).toHaveBeenCalled();
                     });
+                });
+            });
+
+            describe("using s containerless binding", function() {
+                it("should respect the containerless binding syntax", function() {
+                    applyBindings("module: { name: 'has-constructor' }", {}, null, function() {
+                        expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                    }, true);
                 });
             });
 

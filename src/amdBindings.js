@@ -78,3 +78,5 @@ ko.bindingHandlers.module = {
     baseDir: "",
     initializer: "initialize"
 };
+
+ko.virtualElements.allowedBindings.module = true;
