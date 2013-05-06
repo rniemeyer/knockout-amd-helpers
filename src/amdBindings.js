@@ -1,19 +1,3 @@
-var require = window.require || window.curl,
-    unwrap = ko.utils.unwrapObservable,
-    //call a constructor function with a variable number of arguments
-    construct = function(Constructor, args) {
-        var instance,
-            Wrapper = function() {
-                return Constructor.apply(this, args);
-            };
-
-        Wrapper.prototype = Constructor.prototype;
-        instance = new Wrapper();
-        instance.constructor = Constructor;
-
-        return instance;
-    };
-
 //an AMD helper binding that allows declarative module loading/binding
 ko.bindingHandlers.module = {
     init: function(element, valueAccessor, allBindingsAccessor, data, context) {
@@ -68,7 +52,7 @@ ko.bindingHandlers.module = {
 
                 //at this point, if we have a module name, then retrieve it via the text plugin
                 if (moduleName) {
-                    require([ko.bindingHandlers.module.baseDir + "/" + moduleName + ".js"], function(mod) {
+                    require([addTrailingSlash(ko.bindingHandlers.module.baseDir) + moduleName], function(mod) {
                         //if it is a constructor function then create a new instance
                         if (typeof mod === "function") {
                             mod = construct(mod, initialArgs);

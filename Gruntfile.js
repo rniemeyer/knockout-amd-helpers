@@ -10,7 +10,7 @@ module.exports = function(grunt) {
                 banner: '// <%= pkg.name %> <%= pkg.version %> | (c) <%= grunt.template.today("yyyy") %> Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license\n'
             },
             dist: {
-                src: ['src/intro.txt', 'src/*.js', 'src/outro.txt'],
+                src: ['src/intro.txt', 'src/utilities.js', 'src/amdBindings.js', 'src/amdTemplateEngine.js', 'src/outro.txt'],
                 dest: 'build/<%= pkg.name %>.js'
             }
         },

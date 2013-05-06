@@ -4,7 +4,7 @@
     var engine = new ko.nativeTemplateEngine(),
         sources = {};
 
-    engine.defaultPath = "templates/";
+    engine.defaultPath = "templates";
     engine.defaultSuffix = ".tmpl.html";
 
     //create a template source that loads its template using the require.js text plugin
@@ -17,7 +17,7 @@
     ko.templateSources.requireTemplate.prototype.text = function(value) {
         //when the template is retrieved, check if we need to load it
         if (!this.requested && this.key) {
-            require(["text!" + engine.defaultPath + this.key + engine.defaultSuffix], this.template);
+            require(["text!" + addTrailingSlash(engine.defaultPath) + this.key + engine.defaultSuffix], this.template);
             this.requested = true;
         }
 
