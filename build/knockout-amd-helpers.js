@@ -1,6 +1,7 @@
-// knockout-amd-helpers 0.1.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.2.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
+//helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
 var require = window.require || window.curl,
     unwrap = ko.utils.unwrapObservable,
     //call a constructor function with a variable number of arguments
@@ -15,6 +16,9 @@ var require = window.require || window.curl,
         instance.constructor = Constructor;
 
         return instance;
+    },
+    addTrailingSlash = function(path) {
+        return path && path.replace(/\/?$/, "/");
     };
 
 //an AMD helper binding that allows declarative module loading/binding
@@ -71,7 +75,7 @@ ko.bindingHandlers.module = {
 
                 //at this point, if we have a module name, then retrieve it via the text plugin
                 if (moduleName) {
-                    require([ko.bindingHandlers.module.baseDir + "/" + moduleName + ".js"], function(mod) {
+                    require([addTrailingSlash(ko.bindingHandlers.module.baseDir) + moduleName], function(mod) {
                         //if it is a constructor function then create a new instance
                         if (typeof mod === "function") {
                             mod = construct(mod, initialArgs);
@@ -98,13 +102,16 @@ ko.bindingHandlers.module = {
     initializer: "initialize"
 };
 
+ko.virtualElements.allowedBindings.module = true;
+
+
 //an AMD template engine that uses the text plugin to pull templates
 (function(ko, require) {
     //get a new native template engine to start with
     var engine = new ko.nativeTemplateEngine(),
         sources = {};
 
-    engine.defaultPath = "templates/";
+    engine.defaultPath = "templates";
     engine.defaultSuffix = ".tmpl.html";
 
     //create a template source that loads its template using the require.js text plugin
@@ -117,7 +124,7 @@ ko.bindingHandlers.module = {
     ko.templateSources.requireTemplate.prototype.text = function(value) {
         //when the template is retrieved, check if we need to load it
         if (!this.requested && this.key) {
-            require(["text!" + engine.defaultPath + this.key + engine.defaultSuffix], this.template);
+            require(["text!" + addTrailingSlash(engine.defaultPath) + this.key + engine.defaultSuffix], this.template);
             this.requested = true;
         }
 
