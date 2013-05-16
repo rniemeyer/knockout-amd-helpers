@@ -69,6 +69,10 @@ ko.bindingHandlers.module = {
                         templateBinding.data(mod);
                     });
                 }
+                else {
+                    //ensure that template content is removed if module is cleared
+                    templateBinding.data(null);
+                }
             },
             disposeWhenNodeIsRemoved: element
         });

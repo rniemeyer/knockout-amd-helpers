@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.2.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.2.1 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -91,6 +91,10 @@ ko.bindingHandlers.module = {
                         //update the data that we are binding against
                         templateBinding.data(mod);
                     });
+                }
+                else {
+                    //ensure that template content is removed if module is cleared
+                    templateBinding.data(null);
                 }
             },
             disposeWhenNodeIsRemoved: element
