@@ -7,7 +7,7 @@ ko.bindingHandlers.module = {
             initializer = ko.bindingHandlers.module.initializer || "initialize";
 
         //build up a proper template binding object
-        if (typeof options === "object") {
+        if (options && typeof options === "object") {
             //initializer function name can be overridden
             initializer = options.initializer || initializer;
 

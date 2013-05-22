@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.2.1 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.2.2 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -30,7 +30,7 @@ ko.bindingHandlers.module = {
             initializer = ko.bindingHandlers.module.initializer || "initialize";
 
         //build up a proper template binding object
-        if (typeof options === "object") {
+        if (options && typeof options === "object") {
             //initializer function name can be overridden
             initializer = options.initializer || initializer;
 

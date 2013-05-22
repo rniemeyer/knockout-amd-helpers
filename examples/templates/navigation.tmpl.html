@@ -3,6 +3,8 @@
         <ul class="button-group" data-bind="foreach: articles">
             <li><a href="#" class="button" data-bind="text: $data, click: $root.currentArticle"></a></li>
         </ul>
+        <a href="#" class="button" data-bind="click: $root.currentArticle.bind($root.currentArticle, null)">clear</a>
+        <div data-bind="text: $root.currentArticle"></div>
     </div>
     <h1 data-bind="template: 'header'"></h1>
     <hr />

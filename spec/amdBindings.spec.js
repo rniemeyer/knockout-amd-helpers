@@ -402,6 +402,13 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                         });
                     });
 
+                    it("should not error out when made null", function() {
+                        var observable = ko.observable(null);
+                        applyBindings("module: test", { test: observable }, null, function() {
+                            expect(container.innerText).toEqual("");
+                        });
+                    });
+
                     it("should react to an updated observable by rendering the data/template", function() {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: observable }, null, function() {
