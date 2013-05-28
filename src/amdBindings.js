@@ -50,6 +50,9 @@ ko.bindingHandlers.module = {
                     moduleName = unwrap(moduleName.name);
                 }
 
+                //ensure that data is cleared, so it can't bind against an incorrect template
+                templateBinding.data(null);
+
                 //at this point, if we have a module name, then retrieve it via the text plugin
                 if (moduleName) {
                     require([addTrailingSlash(ko.bindingHandlers.module.baseDir) + moduleName], function(mod) {
@@ -68,10 +71,6 @@ ko.bindingHandlers.module = {
                         //update the data that we are binding against
                         templateBinding.data(mod);
                     });
-                }
-                else {
-                    //ensure that template content is removed if module is cleared
-                    templateBinding.data(null);
                 }
             },
             disposeWhenNodeIsRemoved: element
