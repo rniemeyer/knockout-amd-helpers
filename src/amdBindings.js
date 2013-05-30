@@ -82,4 +82,7 @@ ko.bindingHandlers.module = {
     initializer: "initialize"
 };
 
-ko.virtualElements.allowedBindings.module = true;
+//support KO 2.0 that did not export ko.virtualElements
+if (ko.virtualElements) {
+    ko.virtualElements.allowedBindings.module = true;
+}

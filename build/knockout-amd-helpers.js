@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.2.3 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.2.4 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -105,7 +105,10 @@ ko.bindingHandlers.module = {
     initializer: "initialize"
 };
 
-ko.virtualElements.allowedBindings.module = true;
+//support KO 2.0 that did not export ko.virtualElements
+if (ko.virtualElements) {
+    ko.virtualElements.allowedBindings.module = true;
+}
 
 
 //an AMD template engine that uses the text plugin to pull templates
