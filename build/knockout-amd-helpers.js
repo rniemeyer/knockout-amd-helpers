@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.2.4 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.2.5 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -8,7 +8,7 @@ var require = window.require || window.curl,
     construct = function(Constructor, args) {
         var instance,
             Wrapper = function() {
-                return Constructor.apply(this, args);
+                return Constructor.apply(this, args || []);
             };
 
         Wrapper.prototype = Constructor.prototype;

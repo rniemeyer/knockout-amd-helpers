@@ -5,7 +5,7 @@ var require = window.require || window.curl,
     construct = function(Constructor, args) {
         var instance,
             Wrapper = function() {
-                return Constructor.apply(this, args);
+                return Constructor.apply(this, args || []);
             };
 
         Wrapper.prototype = Constructor.prototype;
