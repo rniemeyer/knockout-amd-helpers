@@ -8,5 +8,8 @@ require.config({
 
 require(["knockout", "modules/app", "knockout-amd-helpers", "text"], function(ko, App) {
     ko.bindingHandlers.module.baseDir = "modules";
-    ko.applyBindings(new App());
+
+    setTimeout(function() {
+        ko.applyBindings(new App());
+    }, 0);
 });
