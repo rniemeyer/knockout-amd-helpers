@@ -4,7 +4,7 @@
 
 This plugin is designed to be a lightweight and flexible solution to working with AMD modules in Knockout.js. It provides two key features:
 
-1- Augments the default template engine to allow it to load **external templates** using the AMD loader's text plugin. This lets you create your templates in individual HTML files and pull them in as needed by name.
+1- Augments the default template engine to allow it to load **external templates** using the AMD loader's text plugin. This lets you create your templates in individual HTML files and pull them in as needed by name (ideally in production the templates are included in your optimized file).
 
 2- Creates a `module` binding that provides a flexible way to load data from an AMD module and either bind it against a template or against an anonymous/inline template.
 
