@@ -11,12 +11,16 @@ ko.bindingHandlers.module = {
             //initializer function name can be overridden
             initializer = options.initializer || initializer;
 
-            //add the non-foreach related other template options
-            ko.utils.arrayForEach(["afterRender", "templateEngine"], function(option) {
-                if (options[option]) {
-                    templateBinding[option] = options[option];
+            templateBinding.templateEngine = options.templateEngine;
+
+            //afterRender could be different for each module, create a wrapper
+            templateBinding.afterRender = function() {
+                var options = unwrap(valueAccessor());
+
+                if (options && typeof options.afterRender === "function") {
+                    options.afterRender.apply(this, arguments);
                 }
-            });
+            };
         }
 
         //if this is not an anonymous template, then build a function to properly return the template name

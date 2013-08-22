@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.2.5 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.3.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -34,12 +34,16 @@ ko.bindingHandlers.module = {
             //initializer function name can be overridden
             initializer = options.initializer || initializer;
 
-            //add the non-foreach related other template options
-            ko.utils.arrayForEach(["afterRender", "templateEngine"], function(option) {
-                if (options[option]) {
-                    templateBinding[option] = options[option];
+            templateBinding.templateEngine = options.templateEngine;
+
+            //afterRender could be different for each module, create a wrapper
+            templateBinding.afterRender = function() {
+                var options = unwrap(valueAccessor());
+
+                if (options && typeof options.afterRender === "function") {
+                    options.afterRender.apply(this, arguments);
                 }
-            });
+            };
         }
 
         //if this is not an anonymous template, then build a function to properly return the template name

@@ -210,7 +210,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                 });
             });
 
-            describe("using s containerless binding", function() {
+            describe("using containerless binding", function() {
                 it("should respect the containerless binding syntax", function() {
                     applyBindings("module: { name: 'has-constructor' }", {}, null, function() {
                         expect(container.innerText).toEqual("has-constructor: Ted Jones");
@@ -391,6 +391,25 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
 
                     updateObservable(observable, { name: "has-constructor" }, function() {
                         expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                    });
+                });
+
+                it("should run the appropriate afterRender function", function() {
+                    var afterRenderOne = jasmine.createSpy("afterRenderOne"),
+                        afterRenderTwo = jasmine.createSpy("afterRenderTwo"),
+                        observable = ko.observable({ name: "static-no-initialize", afterRender: afterRenderOne }),
+                        moduleTwo = { name: "has-constructor", afterRender: afterRenderTwo };
+
+                    applyBindings("module: test", { test: observable }, null, function() {
+                        expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
+                        expect(afterRenderOne).toHaveBeenCalled();
+                        expect(afterRenderTwo).not.toHaveBeenCalled();
+                    });
+
+                    updateObservable(observable, moduleTwo, function() {
+                        expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                        expect(afterRenderOne.callCount).toEqual(1);
+                        expect(afterRenderTwo).toHaveBeenCalled();
                     });
                 });
 
