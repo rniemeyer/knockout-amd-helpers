@@ -1,0 +1,14 @@
+{
+    "name": "knockout-amd-helpers",
+    "version": "0.4.0",
+    "main": "build/knockout-amd-heleprs.min.js",
+    "ignore": [
+        "examples",
+        "ext",
+        "spec",
+        "src",
+        "Gruntfile.js",
+        "package.json",
+        ".gitignore"
+    ]
+}

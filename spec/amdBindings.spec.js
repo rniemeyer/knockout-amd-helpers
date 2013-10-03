@@ -18,9 +18,11 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                 }
                 else {
                     var opening = document.createComment("ko " + bindingString),
-                       closing = document.createComment("/ko");
+                       closing = document.createComment("/ko"),
+                        dummy = document.createTextNode("   \n  ");
 
                     container.appendChild(opening);
+                    container.appendChild(dummy);
                     container.appendChild(closing);
                 }
 
@@ -85,12 +87,28 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                     });
                 });
 
-                describe("using s containerless binding", function() {
+                describe("using a containerless binding", function() {
                    it("should respect the containerless binding syntax", function() {
                        applyBindings("module: 'has-constructor'", {}, null, function() {
                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
                        }, true);
                    });
+                });
+
+                describe("only text nodes inside of the element", function() {
+                    it("should not consider only text nodes to be an anonymous template", function() {
+                        applyBindings("module: 'has-constructor'", {}, "  \n  ", function() {
+                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                        });
+                    });
+                });
+
+                describe("only text nodes inside of a containerless binding", function() {
+                    it("should not consider only text nodes to be an anonymous template", function() {
+                        applyBindings("module: 'has-constructor'", {}, "  \n  ", function() {
+                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                        }, true);
+                    });
                 });
             });
 

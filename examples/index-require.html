@@ -10,9 +10,12 @@
     <title></title>
 </head>
 <body>
-    <div class="row" data-bind="module: 'navigation'"></div>
+    <!-- ko module: 'navigation' -->
+    <!-- /ko -->
 
-    <div class="row" data-bind="template: 'content'"></div>
+    <div class="row" data-bind="template: 'content'">
+
+    </div>
 
     <footer class="row" data-bind="template: 'footer'"></footer>
 
