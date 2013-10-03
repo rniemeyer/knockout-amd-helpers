@@ -1,7 +1,7 @@
 {
     "name": "knockout-amd-helpers",
     "version": "0.4.0",
-    "main": "build/knockout-amd-heleprs.min.js",
+    "main": "build/knockout-amd-helpers.min.js",
     "ignore": [
         "examples",
         "ext",
