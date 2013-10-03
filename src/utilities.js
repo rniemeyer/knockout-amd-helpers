@@ -16,4 +16,17 @@ var require = window.require || window.curl,
     },
     addTrailingSlash = function(path) {
         return path && path.replace(/\/?$/, "/");
+    },
+    isAnonymous = function(node) {
+        var el = ko.virtualElements.firstChild(node);
+
+        while (el) {
+            if (el.nodeType === 1 || el.nodeType === 8) {
+                return true;
+            }
+
+            el = ko.virtualElements.nextSibling(el);
+        }
+
+        return false;
     };

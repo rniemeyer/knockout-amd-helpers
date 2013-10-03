@@ -1,8 +1,7 @@
 //an AMD helper binding that allows declarative module loading/binding
 ko.bindingHandlers.module = {
     init: function(element, valueAccessor, allBindingsAccessor, data, context) {
-        var el, isAnonymous,
-            value = valueAccessor(),
+        var value = valueAccessor(),
             options = unwrap(value),
             templateBinding = {},
             initializer = ko.bindingHandlers.module.initializer || "initialize";
@@ -24,19 +23,8 @@ ko.bindingHandlers.module = {
             };
         }
 
-        //determine if the element contains an anonymous template
-        el = ko.virtualElements.firstChild(element);
-
-        while (!isAnonymous && el) {
-            if (el.nodeType === 1 || el.nodeType === 8) {
-                isAnonymous = true;
-            }
-
-            el = ko.virtualElements.nextSibling(el);
-        }
-
         //if this is not an anonymous template, then build a function to properly return the template name
-        if (!isAnonymous) {
+        if (!isAnonymous(element)) {
             templateBinding.name = function() {
                 var template = unwrap(value);
                 return ((template && typeof template === "object") ? unwrap(template.template || template.name) : template) || "";
