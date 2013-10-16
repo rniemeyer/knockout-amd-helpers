@@ -40,10 +40,13 @@ ko.bindingHandlers.module = {
         //disposal function to use when a module is swapped or element is removed
         disposeModule = function() {
             var currentData = templateBinding.data();
-            if (currentData && typeof currentData[disposeMethod] === "function") {
-                currentData[disposeMethod].call(currentData);
+            if (currentData) {
+                if (typeof currentData[disposeMethod] === "function") {
+                    currentData[disposeMethod].call(currentData);
+                    currentData = null;
+                }
+
                 templateBinding.data(null);
-                currentData = null;
             }
         };
 
@@ -68,7 +71,7 @@ ko.bindingHandlers.module = {
                 }
 
                 //if there is a current module and it has a dispose callback, execute it and clear the data
-                disposeModule();
+                ko.computed(disposeModule).dispose();
 
                 //at this point, if we have a module name, then require it dynamically
                 if (moduleName) {
