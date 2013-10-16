@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.4.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.5.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -37,17 +37,15 @@ var require = window.require || window.curl,
 //an AMD helper binding that allows declarative module loading/binding
 ko.bindingHandlers.module = {
     init: function(element, valueAccessor, allBindingsAccessor, data, context) {
-        var extendedContext,
+        var extendedContext, disposeModule,
             value = valueAccessor(),
             options = unwrap(value),
             templateBinding = {},
-            initializer = ko.bindingHandlers.module.initializer || "initialize";
+            initializer = ko.bindingHandlers.module.initializer,
+            disposeMethod = ko.bindingHandlers.module.disposeMethod;
 
         //build up a proper template binding object
         if (options && typeof options === "object") {
-            //initializer function name can be overridden
-            initializer = options.initializer || initializer;
-
             templateBinding.templateEngine = options.templateEngine;
 
             //afterRender could be different for each module, create a wrapper
@@ -72,18 +70,32 @@ ko.bindingHandlers.module = {
         templateBinding.data = ko.observable();
         templateBinding["if"] = templateBinding.data;
 
-        //actually apply the template binding that we built
+        //actually apply the template binding that we built. extend the context to include a $module property
         ko.applyBindingsToNode(element, { template: templateBinding }, extendedContext = context.extend({ $module: null }));
+
+        //disposal function to use when a module is swapped or element is removed
+        disposeModule = function() {
+            var currentData = templateBinding.data();
+            if (currentData && typeof currentData[disposeMethod] === "function") {
+                currentData[disposeMethod].call(currentData);
+                templateBinding.data(null);
+                currentData = null;
+            }
+        };
 
         //now that we have bound our element using the template binding, pull the module and populate the observable.
         ko.computed({
             read: function() {
                 //module name could be in an observable
-                var moduleName = unwrap(value),
-                    initialArgs;
+                var initialArgs,
+                    moduleName = unwrap(value);
 
                 //observable could return an object that contains a name property
                 if (moduleName && typeof moduleName === "object") {
+                    //initializer/dispose function name can be overridden
+                    initializer = moduleName.initializer || initializer;
+                    disposeMethod = moduleName.disposeMethod || disposeMethod;
+
                     //get the current copy of data to pass into module
                     initialArgs = [].concat(unwrap(moduleName.data));
 
@@ -91,11 +103,10 @@ ko.bindingHandlers.module = {
                     moduleName = unwrap(moduleName.name);
                 }
 
-                //TODO investigate adding a configurable dispose function that is called here
-                //ensure that data is cleared, so it can't bind against an incorrect template
-                templateBinding.data(null);
+                //if there is a current module and it has a dispose callback, execute it and clear the data
+                disposeModule();
 
-                //at this point, if we have a module name, then retrieve it via the text plugin
+                //at this point, if we have a module name, then require it dynamically
                 if (moduleName) {
                     require([addTrailingSlash(ko.bindingHandlers.module.baseDir) + moduleName], function(mod) {
                         //if it is a constructor function then create a new instance
@@ -119,10 +130,14 @@ ko.bindingHandlers.module = {
             disposeWhenNodeIsRemoved: element
         });
 
+        //optionally call module disposal when removing an element
+        ko.utils.domNodeDisposal.addDisposeCallback(element, disposeModule);
+
         return { controlsDescendantBindings: true };
     },
     baseDir: "",
-    initializer: "initialize"
+    initializer: "initialize",
+    disposeMethod: "dispose"
 };
 
 //support KO 2.0 that did not export ko.virtualElements

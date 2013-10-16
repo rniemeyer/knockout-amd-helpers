@@ -618,5 +618,91 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                 });
             });
         });
+
+        describe("when using the disposeMethod option", function() {
+            var mod, called, context,
+                observable = ko.observable("static-no-initialize");
+
+            it("should call \"dispose\" by default", function() {
+                applyBindings("module: { name: test }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
+                    mod = ko.contextFor(container).$module;
+
+                    mod.dispose = function() {
+                        called = true;
+                        context = this;
+                    };
+                });
+
+                updateObservable(observable, null, function() {
+                    expect(called).toBeTruthy();
+                    expect(context).toEqual(mod);
+                    delete mod.dispose;
+                });
+            });
+
+            it("should allow overriding disposeMethod globally", function() {
+                var mod, called, context,
+                    existing = ko.bindingHandlers.module.disposeMethod,
+                    observable = ko.observable("static-no-initialize");
+
+                ko.bindingHandlers.module.disposeMethod = "myDisposeMethod";
+
+                applyBindings("module: { name: test }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
+                    mod = ko.contextFor(container).$module;
+
+                    mod.myDisposeMethod = function() {
+                        called = true;
+                        context = this;
+                    };
+                });
+
+                updateObservable(observable, null, function() {
+                    expect(called).toBeTruthy();
+                    expect(context).toEqual(mod);
+                    delete mod.myDisposeMethod;
+                    ko.bindingHandlers.module.disposeMethod = existing;
+                });
+            });
+
+            it("should allow overriding disposeMethod in binding", function() {
+                var mod, called, context,
+                    observable = ko.observable("static-no-initialize");
+
+                applyBindings("module: { name: test, disposeMethod: 'cleanUp' }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
+                    mod = ko.contextFor(container).$module;
+
+                    mod.cleanUp = function() {
+                        called = true;
+                        context = this;
+                    };
+                });
+
+                updateObservable(observable, null, function() {
+                    expect(called).toBeTruthy();
+                    expect(context).toEqual(mod);
+                    delete mod.cleanUp;
+                });
+            });
+
+            it("should call the module's dispose when the element is removed", function() {
+                var mod, called, context,
+                    observable = ko.observable("static-no-initialize");
+
+                applyBindings("module: { name: test }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
+                    mod = ko.contextFor(container).$module;
+
+                    mod.dispose = function() {
+                        called = true;
+                        context = this;
+                    };
+
+                    ko.removeNode(container);
+
+                    expect(called).toBeTruthy();
+                    expect(context).toEqual(mod);
+                    delete mod.dispose;
+                });
+            });
+        })
     });
 });

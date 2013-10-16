@@ -64,13 +64,13 @@ In this example, it will follow the same logic as the previous example, but it w
 ###Example with all options   
     
     <div data-bind="module: { name: 'one', data: initialData, template: 'oneTmpl',
-                              initializer: 'createItem'', afterRender: myAfterRender }"></div>
+                              initializer: 'createItem', disposeMethod: 'clean', afterRender: myAfterRender }"></div>
     
-This example includes a number of options options that can be passed to the `module` binding. In this case, the template is overriden to use `oneTmpl`, a custom initializer function is used, and an `afterRender` function is passed on to the template binding.
+This example includes a number of options options that can be passed to the `module` binding. In this case, the template is overriden to use `oneTmpl`, a custom initializer function is used, a custom disposal method is specified, and an `afterRender` function is passed on to the template binding.
 
 ###Dynamically binding against a module
 
-The `module` binding supports binding against an observable or passing an observable for the `name`, `template`. and `data` options. The content will be appropriately updated based on the new values. This allows you to dynamically bind an area to a module that is updated as the user interacts with your site.
+The `module` binding supports binding against an observable or passing an observable for the `name`, `template` and `data` options. The content will be appropriately updated based on the new values. This allows you to dynamically bind an area to a module that is updated as the user interacts with your site.
 
 ###$module context variable
 
@@ -90,6 +90,9 @@ The `template` option provides the ability to override the template used for the
 ####initializer
 If the module returns an object (rather than a constructor function), then the binding will attempt to call an initializer function, if it exists. By default, this function is called `initialize`, but you can override the name of the function to call using this option or globally by setting `ko.bindingHandlers.module.initializer` to the name of the function that you want to use.
 
+####disposeMethod
+When a module is swapped out, you can specify a custom function name to call to do any necessary clean up.
+
 ####afterRender
 The `afterRender` function will be passed on the the template binding, if specified.
 
@@ -102,6 +105,8 @@ The `baseDir` is used in building the path to use in the `require` statement. If
 ####ko.bindingHandlers.module.initializer (default: "initialize")
 This allows the ability to globally override the function that the `module` binding calls after loading an AMD module that does not return a constructor.
 
+####ko.bindingHandlers.module.disposeMethod (default: "dispose")
+The dispose method name can be globally overriden. This function is optionally called when a module is being removed/swapped.
 
 ##Dependencies
 
