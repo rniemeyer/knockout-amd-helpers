@@ -1,7 +1,8 @@
 //an AMD helper binding that allows declarative module loading/binding
 ko.bindingHandlers.module = {
     init: function(element, valueAccessor, allBindingsAccessor, data, context) {
-        var value = valueAccessor(),
+        var extendedContext,
+            value = valueAccessor(),
             options = unwrap(value),
             templateBinding = {},
             initializer = ko.bindingHandlers.module.initializer || "initialize";
@@ -35,8 +36,8 @@ ko.bindingHandlers.module = {
         templateBinding.data = ko.observable();
         templateBinding["if"] = templateBinding.data;
 
-        //actually apply the template binding that we built
-        ko.applyBindingsToNode(element, { template: templateBinding },  context);
+        //actually apply the template binding that we built. extend the context to include a $module property
+        ko.applyBindingsToNode(element, { template: templateBinding }, extendedContext = context.extend({ $module: null }));
 
         //now that we have bound our element using the template binding, pull the module and populate the observable.
         ko.computed({
@@ -57,7 +58,7 @@ ko.bindingHandlers.module = {
                 //ensure that data is cleared, so it can't bind against an incorrect template
                 templateBinding.data(null);
 
-                //at this point, if we have a module name, then retrieve it via the text plugin
+                //at this point, if we have a module name, then require it dynamically
                 if (moduleName) {
                     require([addTrailingSlash(ko.bindingHandlers.module.baseDir) + moduleName], function(mod) {
                         //if it is a constructor function then create a new instance
@@ -73,6 +74,7 @@ ko.bindingHandlers.module = {
                         }
 
                         //update the data that we are binding against
+                        extendedContext.$module = mod;
                         templateBinding.data(mod);
                     });
                 }

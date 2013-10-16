@@ -367,7 +367,6 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                             });
                         });
                     });
-
                 });
 
                 describe("using anonymous template", function() {
@@ -581,6 +580,41 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                             expect(container.innerText).toEqual("");
                         });
                     });
+                });
+            });
+        });
+
+        describe("when accessing $module context property", function() {
+
+            it("should return the current module", function() {
+                var observable = ko.observable();
+                applyBindings("module: 'static-no-initialize'", {}, null, function() {
+                    var context = ko.contextFor(container);
+                    expect(context.$module.first()).toEqual("Bob");
+                });
+            });
+
+            it("should return the current module from inner contexts", function() {
+                applyBindings("module: { name: 'static-no-initialize' }", {}, "<div data-bind='with: first'><span data-bind='text: $module.last'></span></div>", function() {
+                    expect(container.innerText).toEqual("Smith");
+                });
+            });
+
+            it("should return the current module even when inside a parent module", function() {
+                applyBindings("module: { name: 'static-no-initialize' }", {}, "<span data-bind='text: $module.last'></span><span data-bind=\"module: 'has-constructor'\"><span data-bind='text: $module.last'></span></span>", function() {
+                    expect(container.innerText).toEqual("SmithJones");
+                });
+            });
+
+            it("should update the current module when it is updated", function() {
+                var observable = ko.observable("static-no-initialize");
+
+                applyBindings("module: { name: test }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
+                    expect(container.innerText).toEqual("Smith");
+                });
+
+                updateObservable(observable, "has-constructor", function() {
+                    expect(container.innerText).toEqual("Jones");
                 });
             });
         });

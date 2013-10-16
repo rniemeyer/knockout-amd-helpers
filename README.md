@@ -72,6 +72,10 @@ This example includes a number of options options that can be passed to the `mod
 
 The `module` binding supports binding against an observable or passing an observable for the `name`, `template`. and `data` options. The content will be appropriately updated based on the new values. This allows you to dynamically bind an area to a module that is updated as the user interacts with your site.
 
+###$module context variable
+
+The `module` binding adds a `$module` context variable that can be bound against. This can be useful when you want to bind against the equivalent of `$root` for just your module. When modules are nested inside other modules, `$module` will always refer to the root of the current module.
+
 ###module binding options
 
 ####name

@@ -37,7 +37,8 @@ var require = window.require || window.curl,
 //an AMD helper binding that allows declarative module loading/binding
 ko.bindingHandlers.module = {
     init: function(element, valueAccessor, allBindingsAccessor, data, context) {
-        var value = valueAccessor(),
+        var extendedContext,
+            value = valueAccessor(),
             options = unwrap(value),
             templateBinding = {},
             initializer = ko.bindingHandlers.module.initializer || "initialize";
@@ -72,7 +73,7 @@ ko.bindingHandlers.module = {
         templateBinding["if"] = templateBinding.data;
 
         //actually apply the template binding that we built
-        ko.applyBindingsToNode(element, { template: templateBinding },  context);
+        ko.applyBindingsToNode(element, { template: templateBinding }, extendedContext = context.extend({ $module: null }));
 
         //now that we have bound our element using the template binding, pull the module and populate the observable.
         ko.computed({
@@ -90,6 +91,7 @@ ko.bindingHandlers.module = {
                     moduleName = unwrap(moduleName.name);
                 }
 
+                //TODO investigate adding a configurable dispose function that is called here
                 //ensure that data is cleared, so it can't bind against an incorrect template
                 templateBinding.data(null);
 
@@ -109,6 +111,7 @@ ko.bindingHandlers.module = {
                         }
 
                         //update the data that we are binding against
+                        extendedContext.$module = mod;
                         templateBinding.data(mod);
                     });
                 }
