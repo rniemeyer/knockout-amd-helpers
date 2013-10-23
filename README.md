@@ -16,7 +16,7 @@ For example, when doing:
 
     <ul data-bind="template: { name: 'items', foreach: items }"></ul>
 
-The engine will first check to see if there is a `script` tag with the id of `items` and if not, it will load it from the server asynchronously. By default, it will use `templates/` as the default path and `.tmpl.html` as the suffix.  So, in this case it would require `text!templates/items.tmpl.html`. Since, the path is built dynamically, if your template lives in a sub-directory, then you could specify your template like: `sub/path/items`.
+The engine will first check to see if there is a `script` tag with the id of `items` and if not, it will dynamically require the template using the AMD loader's text plugin. By default, it will use `templates/` as the default path and `.tmpl.html` as the suffix.  So, in this case it would require `text!templates/items.tmpl.html`. Since, the path is built dynamically, if your template lives in a sub-directory, then you could specify your template like: `sub/path/items`.
 
 These defaults can be overridden by setting properties on `ko.amdTemplateEngine`. For example:
 
