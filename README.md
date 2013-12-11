@@ -20,8 +20,9 @@ The engine will first check to see if there is a `script` tag with the id of `it
 
 These defaults can be overridden by setting properties on `ko.amdTemplateEngine`. For example:
 
-    ko.amdTemplateEngine.defaultPath = "your/path/to/templates";`
-    ko.amdTemplateEngine.defaultSuffix = ".template.html";`
+    ko.amdTemplateEngine.defaultPath = "your/path/to/templates";
+    ko.amdTemplateEngine.defaultSuffix = ".template.html";
+    ko.amdTemplateEngine.defaultRequireTextPluginName = "text";
     
 ##module binding
 
