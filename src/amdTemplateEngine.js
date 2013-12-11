@@ -60,7 +60,7 @@
         }
     };
 
-    //expose the template engine at least to be able to customize the "defaultPath" at run-time
+    //expose the template engine at least to be able to customize the path/suffix/plugin at run-time
     ko.amdTemplateEngine = engine;
 
     //make this new template engine our default engine
