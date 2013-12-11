@@ -39,12 +39,14 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
 
         describe("options", function() {
             var path = ko.amdTemplateEngine.defaultPath,
-                suffix = ko.amdTemplateEngine.defaultSuffix;
+                suffix = ko.amdTemplateEngine.defaultSuffix,
+                plugin = ko.amdTemplateEngine.defaultRequireTextPluginName;
 
             //reset defaults
             afterEach(function() {
                 ko.amdTemplateEngine.defaultPath = path;
                 ko.amdTemplateEngine.defaultSuffix = suffix;
+                ko.amdTemplateEngine.defaultRequireTextPluginName = plugin;
             });
 
             it("should respect the 'defaultPath' option", function() {
@@ -58,6 +60,13 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                 ko.amdTemplateEngine.defaultSuffix = ".html";
                 applyBindings("template: 'person-without-tmpl'", { first: ko.observable("Jon"), last: ko.observable("Black") }, null, function() {
                     expect(container.innerText).toEqual("person-without-tmpl: Jon Black");
+                });
+            });
+
+            it("should respect the 'defaultRequireTextPluginName' option", function() {
+                ko.amdTemplateEngine.defaultRequireTextPluginName = "text-alternate";
+                applyBindings("template: 'text-plugin-name-test'", { first: ko.observable("Jon"), last: ko.observable("Black") }, null, function() {
+                    expect(container.innerText).toEqual("text-plugin-name-test: Jon Black");
                 });
             });
         });
