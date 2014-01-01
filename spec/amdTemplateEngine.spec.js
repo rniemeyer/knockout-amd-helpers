@@ -18,7 +18,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             ko.cleanNode(sandbox);
             ko.applyBindings(data, sandbox);
 
-            setTimeout(callback, 100);
+            setTimeout(callback, 50);
         };
 
         //clear the sandbox before each test
@@ -72,6 +72,20 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             });
         });
 
+        it("should call the afterRender function only after the template is ready", function(done) {
+            var vm = {
+                first: ko.observable("Jon"),
+                last: ko.observable("Black"),
+                rendered: jasmine.createSpy()
+            };
+
+            applyBindings("template: { name: 'fresh', afterRender: rendered }", vm, null, function() {
+                expect(container.innerText).toEqual("fresh: Jon Black");
+                expect(vm.rendered.calls.count()).toEqual(1);
+                done();
+            });
+        });
+
         it("should still first use a template in a script tag", function(done) {
             var template = document.createElement("script");
             template.type = "text/html";
@@ -83,7 +97,6 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                 expect(container.innerText).toEqual("Jon:Black");
                 done();
             });
-
         });
     });
 });

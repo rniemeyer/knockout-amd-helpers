@@ -30,7 +30,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             ko.cleanNode(sandbox);
             ko.applyBindings(data, sandbox);
 
-            setTimeout(callback, 100);
+            setTimeout(callback, 50);
         };
 
         //helper to update an observable, wait, and check result
@@ -41,7 +41,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
 
                    callback();
 
-               }, 100);
+               }, 50);
             });
 
             observable(value);

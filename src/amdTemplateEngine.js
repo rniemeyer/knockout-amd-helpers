@@ -72,7 +72,7 @@
             existingAfterRender = options && options.afterRender;
 
         //wrap the existing afterRender, so it is not called until template is actuall retrieved
-        if (typeof existingAfterRender === "function" && templateSource instanceof ko.templateSources.requireTemplate) {
+        if (typeof existingAfterRender === "function" && templateSource instanceof ko.templateSources.requireTemplate && !templateSource.retrieved) {
             options.afterRender = function() {
                 if (templateSource.retrieved) {
                     existingAfterRender.apply(this, arguments);
