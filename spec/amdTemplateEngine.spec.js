@@ -8,21 +8,17 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
         document.body.appendChild(sandbox);
 
         //helper to apply bindings, wait, and check result
-        var applyBindings = function(bindingString, data, children, callback) {
-            runs(function() {
-                container = document.createElement("div");
-                container.setAttribute("data-bind", bindingString);
-                container.innerHTML = children || "";
+        var applyBindings = function(bindingString, data, children, callback, done) {
+            container = document.createElement("div");
+            container.setAttribute("data-bind", bindingString);
+            container.innerHTML = children || "";
 
-                sandbox.appendChild(container);
+            sandbox.appendChild(container);
 
-                ko.cleanNode(sandbox);
-                ko.applyBindings(data, sandbox);
-            });
+            ko.cleanNode(sandbox);
+            ko.applyBindings(data, sandbox);
 
-            waits(100);
-
-            runs(callback);
+            setTimeout(callback, 100);
         };
 
         //clear the sandbox before each test
@@ -32,9 +28,10 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             }
         });
 
-        it("should load the template properly", function() {
+        it("should load the template properly", function(done) {
             applyBindings("template: 'person'", { first: ko.observable("Jon"), last: ko.observable("Black") }, null, function() {
                 expect(container.innerText).toEqual("person: Jon Black");
+                done();
             });
         });
 
@@ -50,29 +47,32 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                 ko.amdTemplateEngine.defaultRequireTextPluginName = plugin;
             });
 
-            it("should respect the 'defaultPath' option", function() {
+            it("should respect the 'defaultPath' option", function(done) {
                 ko.amdTemplateEngine.defaultPath = "templates/alternate-path/";
                 applyBindings("template: 'alternate-path'", { first: ko.observable("Jon"), last: ko.observable("Black") }, null, function() {
                     expect(container.innerText).toEqual("alternate-path: Jon Black");
+                    done();
                 });
             });
 
-            it("should respect the 'defaultSuffix' option", function() {
+            it("should respect the 'defaultSuffix' option", function(done) {
                 ko.amdTemplateEngine.defaultSuffix = ".html";
                 applyBindings("template: 'person-without-tmpl'", { first: ko.observable("Jon"), last: ko.observable("Black") }, null, function() {
                     expect(container.innerText).toEqual("person-without-tmpl: Jon Black");
+                    done();
                 });
             });
 
-            it("should respect the 'defaultRequireTextPluginName' option", function() {
+            it("should respect the 'defaultRequireTextPluginName' option", function(done) {
                 ko.amdTemplateEngine.defaultRequireTextPluginName = "text-alternate";
                 applyBindings("template: 'text-plugin-name-test'", { first: ko.observable("Jon"), last: ko.observable("Black") }, null, function() {
                     expect(container.innerText).toEqual("text-plugin-name-test: Jon Black");
+                    done();
                 });
             });
         });
 
-        it("should still first use a template in a script tag", function() {
+        it("should still first use a template in a script tag", function(done) {
             var template = document.createElement("script");
             template.type = "text/html";
             template.id = "person";
@@ -81,6 +81,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
 
             applyBindings("template: 'person'", { first: ko.observable("Jon"), last: ko.observable("Black") }, null, function() {
                 expect(container.innerText).toEqual("Jon:Black");
+                done();
             });
 
         });

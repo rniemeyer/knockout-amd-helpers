@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="lib/jasmine.css">
     <script type="text/javascript" src="lib/jasmine.js"></script>
     <script type="text/javascript" src="lib/jasmine-html.js"></script>
+    <script type="text/javascript" src="lib/boot.js"></script>
 
     <script type="text/javascript">
         var require = {
@@ -27,9 +28,11 @@
 
 <body>
     <script type="text/javascript">
+        var start = window.onload;
+        window.onload = null;
+
         require(["knockout", "knockout-amd-helpers", "amdBindings.spec", "amdTemplateEngine.spec", "text"], function() {
-            jasmine.getEnv().addReporter(new jasmine.HtmlReporter());
-            jasmine.getEnv().execute();
+            start();
         });
     </script>
 </body>

@@ -10,42 +10,41 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
 
         //helper to apply bindings, wait, and check result
         var applyBindings = function(bindingString, data, children, callback, containerless) {
-            runs(function() {
-                container = document.createElement("div");
-                if (!containerless) {
-                    container.setAttribute("data-bind", bindingString);
-                    container.innerHTML = children || "";
-                }
-                else {
-                    var opening = document.createComment("ko " + bindingString),
-                       closing = document.createComment("/ko"),
-                        dummy = document.createTextNode("   \n  ");
+            container = document.createElement("div");
+            if (!containerless) {
+                container.setAttribute("data-bind", bindingString);
+                container.innerHTML = children || "";
+            }
+            else {
+                var opening = document.createComment("ko " + bindingString),
+                   closing = document.createComment("/ko"),
+                    dummy = document.createTextNode("   \n  ");
 
-                    container.appendChild(opening);
-                    container.appendChild(dummy);
-                    container.appendChild(closing);
-                }
+                container.appendChild(opening);
+                container.appendChild(dummy);
+                container.appendChild(closing);
+            }
 
-                sandbox.appendChild(container);
+            sandbox.appendChild(container);
 
-                ko.cleanNode(sandbox);
-                ko.applyBindings(data, sandbox);
-            });
+            ko.cleanNode(sandbox);
+            ko.applyBindings(data, sandbox);
 
-            waits(100);
-
-            runs(callback);
+            setTimeout(callback, 100);
         };
 
         //helper to update an observable, wait, and check result
         var updateObservable = function(observable, value, callback) {
-            runs(function() {
-                observable(value);
+            var subscription = observable.subscribe(function() {
+               subscription.dispose();
+               setTimeout(function() {
+
+                   callback();
+
+               }, 100);
             });
 
-            waits(100);
-
-            runs(callback);
+            observable(value);
         };
 
         //clear the sandbox before each test
@@ -64,50 +63,56 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
         describe("just passing module name", function() {
             describe("module returns constructor", function() {
                 describe("creating instances", function() {
-                    it("should create an instance", function() {
+                    it("should create an instance", function(done) {
                         applyBindings("module: 'has-constructor'", {}, "<span></span>", function() {
                             var data = ko.dataFor(container.firstChild);
                             expect(ko.toJSON(data)).toEqual('{"first":"Ted","last":"Jones"}');
+                            done();
                         });
                     });
                 });
 
                 describe("using anonymous template", function() {
-                    it("should bind properly against the anonymous template", function() {
+                    it("should bind properly against the anonymous template", function(done) {
                         applyBindings("module: 'has-constructor'", {}, "<span data-bind='text: first() + \" \" + last()'></span>", function() {
                             expect(container.innerText).toEqual("Ted Jones");
+                            done();
                         });
                     });
                 });
 
                 describe("using a named template", function() {
-                    it("should use the module name as the template, if none specified and no child elements", function() {
+                    it("should use the module name as the template, if none specified and no child elements", function(done) {
                         applyBindings("module: 'has-constructor'", {}, null, function() {
                             expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            done();
                         });
                     });
                 });
 
                 describe("using a containerless binding", function() {
-                   it("should respect the containerless binding syntax", function() {
+                   it("should respect the containerless binding syntax", function(done) {
                        applyBindings("module: 'has-constructor'", {}, null, function() {
                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                           done();
                        }, true);
                    });
                 });
 
                 describe("only text nodes inside of the element", function() {
-                    it("should not consider only text nodes to be an anonymous template", function() {
+                    it("should not consider only text nodes to be an anonymous template", function(done) {
                         applyBindings("module: 'has-constructor'", {}, "  \n  ", function() {
                             expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            done();
                         });
                     });
                 });
 
                 describe("only text nodes inside of a containerless binding", function() {
-                    it("should not consider only text nodes to be an anonymous template", function() {
+                    it("should not consider only text nodes to be an anonymous template", function(done) {
                         applyBindings("module: 'has-constructor'", {}, "  \n  ", function() {
                             expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            done();
                         }, true);
                     });
                 });
@@ -117,102 +122,112 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                 describe("initialization", function() {
                     describe("object includes initialize function", function() {
                         describe("initialize that does not return value", function() {
-                            it("should call initialize", function() {
+                            it("should call initialize", function(done) {
                                 applyBindings("module: 'static-with-initialize'", {}, "<span></span>", function() {
                                     var data = ko.dataFor(container.firstChild);
                                     expect(ko.toJSON(data)).toEqual('{"first":"Jane","last":"Black"}');
+                                    done();
                                 });
                             });
                         });
 
                         describe("initialize returns value", function() {
-                            it("should call initialize and bind against returned value", function() {
+                            it("should call initialize and bind against returned value", function(done) {
                                 applyBindings("module: 'static-with-initialize-that-returns-object'", {}, "<span></span>", function() {
                                     var data = ko.dataFor(container.firstChild);
                                     expect(ko.toJSON(data)).toEqual('{"first":"Sue","last":"Greene"}');
                                     expect(data.initialize).toBeUndefined();
+                                    done();
                                 });
                             });
                         });
                     });
 
                     describe("object does not include initialize function", function() {
-                        it("should not try to call the initialize function", function() {
+                        it("should not try to call the initialize function", function(done) {
                             applyBindings("module: 'static-no-initialize'", {}, "<span></span>", function() {
                                 var data = ko.dataFor(container.firstChild);
                                 expect(ko.toJSON(data)).toEqual('{"first":"Bob","last":"Smith"}');
+                                done();
                             });
                         });
                     });
                 });
 
                 describe("using anonymous template", function() {
-                    it("should bind properly against the anonymous template", function() {
+                    it("should bind properly against the anonymous template", function(done) {
                         applyBindings("module: 'static-no-initialize'", {}, "<span data-bind='text: first() + \" \" + last()'></span>", function() {
                             expect(container.innerText).toEqual("Bob Smith");
+                            done();
                         });
                     });
                 });
 
                 describe("using a named template", function() {
-                    it("should use the module name as the template, if none specified and no child elements", function() {
+                    it("should use the module name as the template, if none specified and no child elements", function(done) {
                         applyBindings("module: 'static-no-initialize'", {}, null, function() {
                             expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
+                            done();
                         });
                     });
                 });
             });
 
             describe("binding module name against an observable", function() {
-                it("should initially load the proper data/template", function() {
+                it("should initially load the proper data/template", function(done) {
                     var observable = ko.observable("static-no-initialize");
                     applyBindings("module: test", { test: observable }, null, function() {
                         expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
+                        done();
                     });
                 });
 
-                it("should react to an updated observable by rendering the new data/template", function() {
+                it("should react to an updated observable by rendering the new data/template", function(done) {
                     var observable = ko.observable("static-no-initialize");
                     applyBindings("module: test", { test: observable }, null, function() {
                         expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
-                    });
 
-                    updateObservable(observable, "has-constructor", function() {
-                        expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                        updateObservable(observable, "has-constructor", function() {
+                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            done();
+                        });
                     });
                 });
 
                 describe("observable is empty", function() {
-                    it("should not error out initially", function() {
+                    it("should not error out initially", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: observable }, null, function() {
                             expect(container.innerText).toEqual("");
+                            done();
                         });
                     });
 
-                    it("should react to an updated observable by rendering the data/template", function() {
+                    it("should react to an updated observable by rendering the data/template", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: observable }, null, function() {
                             expect(container.innerText).toEqual("");
-                        });
 
-                        updateObservable(observable, "has-constructor", function() {
-                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            updateObservable(observable, "has-constructor", function() {
+                                expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                                done();
+                            });
                         });
                     });
 
-                    it("should handle an observable going back to empty", function() {
+                    it("should handle an observable going back to empty", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: observable }, null, function() {
                             expect(container.innerText).toEqual("");
-                        });
 
-                        updateObservable(observable, "has-constructor", function() {
-                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
-                        });
+                            updateObservable(observable, "has-constructor", function() {
+                                expect(container.innerText).toEqual("has-constructor: Ted Jones");
 
-                        updateObservable(observable, null, function() {
-                            expect(container.innerText).toEqual("");
+                                updateObservable(observable, null, function() {
+                                    expect(container.innerText).toEqual("");
+                                    done();
+                                });
+                            });
                         });
                     });
                 });
@@ -221,64 +236,72 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
 
         describe("passing options object", function() {
             describe("when supplying an afterRender function", function() {
-                it("should call the afterRender function", function() {
+                it("should call the afterRender function", function(done) {
                     var afterRenderCallback = jasmine.createSpy();
                     applyBindings("module: { name: 'has-constructor', afterRender: mycallback }", { mycallback: afterRenderCallback }, "<span></span>", function() {
                         expect(afterRenderCallback).toHaveBeenCalled();
+                        done();
                     });
                 });
             });
 
             describe("using containerless binding", function() {
-                it("should respect the containerless binding syntax", function() {
+                it("should respect the containerless binding syntax", function(done) {
                     applyBindings("module: { name: 'has-constructor' }", {}, null, function() {
                         expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                        done();
                     }, true);
                 });
             });
 
             describe("module returns constructor", function() {
                 describe("creating instances", function() {
-                    it("should create an instance", function() {
+                    it("should create an instance", function(done) {
                         applyBindings("module: { name: 'has-constructor' }", {}, "<span></span>", function() {
                             var data = ko.dataFor(container.firstChild);
                             expect(ko.toJSON(data)).toEqual('{"first":"Ted","last":"Jones"}');
+                            done();
                         });
                     });
 
-                    it("should pass data to the constructor", function() {
+                    it("should pass data to the constructor", function(done) {
                         applyBindings("module: { name: 'has-constructor', data: { first: 'Rod', last: 'Redd' } }", {}, "<span></span>", function() {
                             var data = ko.dataFor(container.firstChild);
                             expect(ko.toJSON(data)).toEqual('{"first":"Rod","last":"Redd"}');
+                            done();
                         });
                     });
 
-                    it("should pass multiple args to constructor", function() {
+                    it("should pass multiple args to constructor", function(done) {
                         applyBindings("module: { name: 'constructor-with-multiple-args', data: ['Stan', 'Vance'] }", {}, "<span></span>", function() {
                             var data = ko.dataFor(container.firstChild);
                             expect(ko.toJSON(data)).toEqual('{"first":"Stan","last":"Vance"}');
+                            done();
                         });
                     });
                 });
 
                 describe("using anonymous template", function() {
-                    it("should bind properly against the anonymous template", function() {
+                    it("should bind properly against the anonymous template", function(done) {
                         applyBindings("module: { name: 'has-constructor' }", {}, "<span data-bind='text: last() + \" \" + first()'></span>", function() {
                             expect(container.innerText).toEqual('Jones Ted');
+                            done();
                         });
                     });
                 });
 
                 describe("using a named template", function() {
-                    it("should use the specified template", function() {
+                    it("should use the specified template", function(done) {
                         applyBindings("module: { name: 'has-constructor', template: 'person' }", {}, null, function() {
                             expect(container.innerText).toEqual('person: Ted Jones');
+                            done();
                         });
                     });
 
-                    it("should use the module name as the template, if none specified and no child elements", function() {
+                    it("should use the module name as the template, if none specified and no child elements", function(done) {
                         applyBindings("module: { name: 'has-constructor' }", {}, null, function() {
                             expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            done();
                         });
                     });
                 });
@@ -287,40 +310,45 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             describe("module returns data", function() {
                 describe("initialization", function() {
                     describe("object includes initialize function", function() {
-                        it("should call the initialize function", function() {
+                        it("should call the initialize function", function(done) {
                             applyBindings("module: { name: 'static-with-initialize' }", {}, "<span></span>", function() {
                                 var data = ko.dataFor(container.firstChild);
                                 expect(ko.toJSON(data)).toEqual('{"first":"Jane","last":"Black"}');
+                                done();
                             });
                         });
 
-                        it("should pass data to the initialize function", function() {
+                        it("should pass data to the initialize function", function(done) {
                             applyBindings("module: { name: 'static-with-initialize', data: { first: 'Lisa', last: 'Peterson' } }", {}, "<span></span>", function() {
                                 var data = ko.dataFor(container.firstChild);
                                 expect(ko.toJSON(data)).toEqual('{"first":"Lisa","last":"Peterson"}');
+                                done();
                             });
                         });
 
-                        it("should pass multiple args to the initialize function", function() {
+                        it("should pass multiple args to the initialize function", function(done) {
                             applyBindings("module: { name: 'static-with-initialize-multiple-args', data: ['Nina', 'Klinke'] }", {}, "<span></span>", function() {
                                 var data = ko.dataFor(container.firstChild);
                                 expect(ko.toJSON(data)).toEqual('{"first":"Nina","last":"Klinke"}');
+                                done();
                             });
                         });
 
                         describe("call custom initializer", function() {
                             describe("specified in binding", function() {
-                                it("should call the custom initialize function", function() {
+                                it("should call the custom initialize function", function(done) {
                                     applyBindings("module: { name: 'static-with-initialize', initializer: 'customInitialize' }", {}, "<span></span>", function() {
                                         var data = ko.dataFor(container.firstChild);
                                         expect(ko.toJSON(data)).toEqual('{"first":"Sarah","last":"Wade"}');
+                                        done();
                                     });
                                 });
 
-                                it("should pass data to the custom initialize function", function() {
+                                it("should pass data to the custom initialize function", function(done) {
                                     applyBindings("module: { name: 'static-with-initialize', initializer: 'customInitialize', data: { first: 'Lisa', last: 'Peterson' } }", {}, "<span></span>", function() {
                                         var data = ko.dataFor(container.firstChild);
                                         expect(ko.toJSON(data)).toEqual('{"first":"Peterson","last":"Lisa"}');
+                                        done();
                                     });
                                 });
                             });
@@ -331,88 +359,97 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                                     ko.bindingHandlers.module.initializer = initializer;
                                 })
 
-                                it("should call the custom initialize function", function() {
+                                it("should call the custom initialize function", function(done) {
                                     ko.bindingHandlers.module.initializer = "customInitialize";
                                     applyBindings("module: { name: 'static-with-initialize' }", {}, "<span></span>", function() {
                                         var data = ko.dataFor(container.firstChild);
                                         expect(ko.toJSON(data)).toEqual('{"first":"Sarah","last":"Wade"}');
+                                        done();
                                     });
                                 });
 
-                                it("should pass data to the custom initialize function", function() {
+                                it("should pass data to the custom initialize function", function(done) {
                                     ko.bindingHandlers.module.initializer = "customInitialize";
                                     applyBindings("module: { name: 'static-with-initialize', data: { first: 'Lisa', last: 'Peterson' } }", {}, "<span></span>", function() {
                                         var data = ko.dataFor(container.firstChild);
                                         expect(ko.toJSON(data)).toEqual('{"first":"Peterson","last":"Lisa"}');
+                                        done();
                                     });
                                 });
                             });
                         });
 
                         describe("initialize returns value", function() {
-                            it("should bind against the returned data", function() {
+                            it("should bind against the returned data", function(done) {
                                 applyBindings("module: { name: 'static-with-initialize-that-returns-object', data: { first: 'Andy', last: 'Arnold' } }", {}, "<span></span>", function() {
                                     var data = ko.dataFor(container.firstChild);
                                     expect(ko.toJSON(data)).toEqual('{"first":"Andy","last":"Arnold"}');
                                     expect(data.initialize).toBeUndefined();
+                                    done();
                                 });
                             });
                         });
                     })
 
                     describe("object does not include initialize function", function() {
-                        it("should not try to call the initialize function", function() {
+                        it("should not try to call the initialize function", function(done) {
                             applyBindings("module: { name: 'static-no-initialize' }", {}, "<span></span>", function() {
                                 var data = ko.dataFor(container.firstChild);
                                 expect(ko.toJSON(data)).toEqual('{"first":"Bob","last":"Smith"}');
+                                done();
                             });
                         });
                     });
                 });
 
                 describe("using anonymous template", function() {
-                    it("should bind properly against the anonymous template", function() {
+                    it("should bind properly against the anonymous template", function(done) {
                         applyBindings("module: { name: 'static-no-initialize' }", {}, "<span data-bind='text: last() + \"/\" + first()'></span>", function() {
                             expect(container.innerText).toEqual("Smith/Bob");
+                            done();
                         });
                     });
                 });
 
                 describe("using a named template", function() {
-                    it("should use the specified template", function() {
+                    it("should use the specified template", function(done) {
                         applyBindings("module: { name: 'static-no-initialize', template: 'person' }", {}, null, function() {
                             expect(container.innerText).toEqual("person: Bob Smith");
+                            done();
                         });
                     });
 
-                    it("should use the module name as the template, if none specified and no child elements", function() {
+                    it("should use the module name as the template, if none specified and no child elements", function(done) {
                         applyBindings("module: { name: 'static-no-initialize' }", {}, null, function() {
                             expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
+                            done();
                         });
                     });
                 });
             });
 
             describe("binding module as options object against an observable", function() {
-                it("should initially load the proper data/template", function() {
+                it("should initially load the proper data/template", function(done) {
                     var observable = ko.observable({ name: "static-no-initialize" });
                     applyBindings("module: test", { test: observable }, null, function() {
                         expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
+                        done();
                     });
                 });
 
-                it("should react to an updated observable by rendering the new data/template", function() {
+                it("should react to an updated observable by rendering the new data/template", function(done) {
                     var observable = ko.observable({ name: "static-no-initialize" });
                     applyBindings("module: test", { test: observable }, null, function() {
                         expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
-                    });
 
-                    updateObservable(observable, { name: "has-constructor" }, function() {
-                        expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                        updateObservable(observable, { name: "has-constructor" }, function() {
+                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            done();
+                        });
                     });
                 });
 
-                it("should run the appropriate afterRender function", function() {
+                it("should run the appropriate afterRender function", function(done) {
                     var afterRenderOne = jasmine.createSpy("afterRenderOne"),
                         afterRenderTwo = jasmine.createSpy("afterRenderTwo"),
                         observable = ko.observable({ name: "static-no-initialize", afterRender: afterRenderOne }),
@@ -422,163 +459,178 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                         expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
                         expect(afterRenderOne).toHaveBeenCalled();
                         expect(afterRenderTwo).not.toHaveBeenCalled();
-                    });
 
-                    updateObservable(observable, moduleTwo, function() {
-                        expect(container.innerText).toEqual("has-constructor: Ted Jones");
-                        expect(afterRenderOne.callCount).toEqual(1);
-                        expect(afterRenderTwo).toHaveBeenCalled();
+                        updateObservable(observable, moduleTwo, function() {
+                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            expect(afterRenderOne.calls.count()).toEqual(1);
+                            expect(afterRenderTwo).toHaveBeenCalled();
+                            done();
+                        });
                     });
                 });
 
                 describe("observable is empty", function() {
-                    it("should not error out initially", function() {
+                    it("should not error out initially", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: observable }, null, function() {
                             expect(container.innerText).toEqual("");
+                            done();
                         });
                     });
 
-                    it("should not error out when made null", function() {
+                    it("should not error out when made null", function(done) {
                         var observable = ko.observable(null);
                         applyBindings("module: test", { test: observable }, null, function() {
                             expect(container.innerText).toEqual("");
+                            done();
                         });
                     });
 
-                    it("should react to an updated observable by rendering the data/template", function() {
+                    it("should react to an updated observable by rendering the data/template", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: observable }, null, function() {
                             expect(container.innerText).toEqual("");
-                        });
 
-                        updateObservable(observable, { name: "has-constructor" }, function() {
-                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            updateObservable(observable, { name: "has-constructor" }, function() {
+                                expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                                done();
+                            });
                         });
                     });
 
-                    it("should handle an observable going back to empty", function() {
+                    it("should handle an observable going back to empty", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: observable }, null, function() {
                             expect(container.innerText).toEqual("");
-                        });
 
-                        updateObservable(observable, { name: "has-constructor" }, function() {
-                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
-                        });
+                            updateObservable(observable, { name: "has-constructor" }, function() {
+                                expect(container.innerText).toEqual("has-constructor: Ted Jones");
 
-                        updateObservable(observable, null, function() {
-                            expect(container.innerText).toEqual("");
+                                updateObservable(observable, null, function() {
+                                    expect(container.innerText).toEqual("");
+                                    done();
+                                });
+                            });
                         });
                     });
                 });
             });
 
             describe("binding options object with observable module name", function() {
-                it("should initially load the proper data/template", function() {
+                it("should initially load the proper data/template", function(done) {
                     var observable = ko.observable("static-no-initialize");
                     applyBindings("module: test", { test: { name: observable } }, null, function() {
                         expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
+                        done();
                     });
                 });
 
-                it("should react to an updated observable by rendering the new data/template", function() {
+                it("should react to an updated observable by rendering the new data/template", function(done) {
                     var observable = ko.observable("static-no-initialize");
                     applyBindings("module: test", { test: { name: observable } }, null, function() {
                         expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
-                    });
 
-                    updateObservable(observable, "has-constructor", function() {
-                        expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                        updateObservable(observable, "has-constructor", function() {
+                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            done();
+                        });
                     });
                 });
 
                 describe("observable is empty", function() {
-                    it("should not error out initially", function() {
+                    it("should not error out initially", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: { name: observable } }, null, function() {
                             expect(container.innerText).toEqual("");
+                            done();
                         });
                     });
 
-                    it("should react to an updated observable by rendering the data/template", function() {
+                    it("should react to an updated observable by rendering the data/template", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: { name: observable } }, null, function() {
                             expect(container.innerText).toEqual("");
-                        });
 
-                        updateObservable(observable, "has-constructor", function() {
-                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            updateObservable(observable, "has-constructor", function() {
+                                expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                                done();
+                            });
                         });
                     });
 
-                    it("should handle an observable going back to empty", function() {
+                    it("should handle an observable going back to empty", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: { name: observable } }, null, function() {
                             expect(container.innerText).toEqual("");
-                        });
 
-                        updateObservable(observable, "has-constructor", function() {
-                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
-                        });
+                            updateObservable(observable, "has-constructor", function() {
+                                expect(container.innerText).toEqual("has-constructor: Ted Jones");
 
-                        updateObservable(observable, null, function() {
-                            expect(container.innerText).toEqual("");
+                                updateObservable(observable, null, function() {
+                                    expect(container.innerText).toEqual("");
+                                    done();
+                                });
+                            });
                         });
                     });
                 });
             });
 
             describe("binding options object with observable template name", function() {
-                it("should initially load the proper data/template", function() {
+                it("should initially load the proper data/template", function(done) {
                     var observable = ko.observable("person");
                     applyBindings("module: test", { test: { name: "static-no-initialize", template: observable } }, null, function() {
                         expect(container.innerText).toEqual("person: Bob Smith");
+                        done();
                     });
                 });
 
-                it("should react to an updated observable by rendering the new data/template", function() {
+                it("should react to an updated observable by rendering the new data/template", function(done) {
                     var observable = ko.observable("person");
                     applyBindings("module: test", { test: { name: "static-no-initialize", template: observable } }, null, function() {
                         expect(container.innerText).toEqual("person: Bob Smith");
-                    });
 
-                    updateObservable(observable, "has-constructor", function() {
-                        expect(container.innerText).toEqual("has-constructor: Bob Smith");
+                        updateObservable(observable, "has-constructor", function() {
+                            expect(container.innerText).toEqual("has-constructor: Bob Smith");
+                            done();
+                        });
                     });
                 });
 
                 describe("observable is empty", function() {
-                    it("should not error out initially", function() {
+                    it("should not error out initially", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: { name: "static-no-initialize", template: observable } }, null, function() {
                             expect(container.innerText).toEqual("");
+                            done();
                         });
                     });
 
-                    it("should react to an updated observable by rendering the data/template", function() {
+                    it("should react to an updated observable by rendering the data/template", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: { name: "static-no-initialize", template: observable } }, null, function() {
                             expect(container.innerText).toEqual("");
-                        });
 
-                        updateObservable(observable, "person", function() {
-                            expect(container.innerText).toEqual("person: Bob Smith");
+                            updateObservable(observable, "person", function() {
+                                expect(container.innerText).toEqual("person: Bob Smith");
+                                done();
+                            });
                         });
                     });
 
-                    it("should handle an observable going back to empty", function() {
+                    it("should handle an observable going back to empty", function(done) {
                         var observable = ko.observable();
                         applyBindings("module: test", { test: { name: "static-no-initialize", template: observable } }, null, function() {
                             expect(container.innerText).toEqual("");
-                        });
 
-                        updateObservable(observable, "person", function() {
-                            expect(container.innerText).toEqual("person: Bob Smith");
-                        });
+                            updateObservable(observable, "person", function() {
+                                expect(container.innerText).toEqual("person: Bob Smith");
 
-                        updateObservable(observable, null, function() {
-                            expect(container.innerText).toEqual("");
+                                updateObservable(observable, null, function() {
+                                    expect(container.innerText).toEqual("");
+                                    done();
+                                });
+                            });
                         });
                     });
                 });
@@ -587,35 +639,39 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
 
         describe("when accessing $module context property", function() {
 
-            it("should return the current module", function() {
+            it("should return the current module", function(done) {
                 var observable = ko.observable();
                 applyBindings("module: 'static-no-initialize'", {}, null, function() {
                     var context = ko.contextFor(container.firstChild);
                     expect(context.$module.first()).toEqual("Bob");
+                    done();
                 });
             });
 
-            it("should return the current module from inner contexts", function() {
+            it("should return the current module from inner contexts", function(done) {
                 applyBindings("module: { name: 'static-no-initialize' }", {}, "<div data-bind='with: first'><span data-bind='text: $module.last'></span></div>", function() {
                     expect(container.innerText).toEqual("Smith");
+                    done();
                 });
             });
 
-            it("should return the current module even when inside a parent module", function() {
+            it("should return the current module even when inside a parent module", function(done) {
                 applyBindings("module: { name: 'static-no-initialize' }", {}, "<span data-bind='text: $module.last'></span><span data-bind=\"module: 'has-constructor'\"><span data-bind='text: $module.last'></span></span>", function() {
                     expect(container.innerText).toEqual("SmithJones");
+                    done();
                 });
             });
 
-            it("should update the current module when it is updated", function() {
+            it("should update the current module when it is updated", function(done) {
                 var observable = ko.observable("static-no-initialize");
 
                 applyBindings("module: { name: test }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
                     expect(container.innerText).toEqual("Smith");
-                });
 
-                updateObservable(observable, "has-constructor", function() {
-                    expect(container.innerText).toEqual("Jones");
+                    updateObservable(observable, "has-constructor", function() {
+                        expect(container.innerText).toEqual("Jones");
+                        done();
+                    });
                 });
             });
         });
@@ -624,7 +680,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             var mod, called, context,
                 observable = ko.observable("static-no-initialize");
 
-            it("should call \"dispose\" by default", function() {
+            it("should call \"dispose\" by default", function(done) {
                 applyBindings("module: { name: test }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
                     mod = ko.contextFor(container.firstChild).$module;
 
@@ -632,16 +688,18 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                         called = true;
                         context = this;
                     };
-                });
 
-                updateObservable(observable, null, function() {
-                    expect(called).toBeTruthy();
-                    expect(context).toEqual(mod);
-                    delete mod.dispose;
+                    updateObservable(observable, null, function() {
+                        expect(called).toBeTruthy();
+                        expect(context).toEqual(mod);
+                        delete mod.dispose;
+
+                        done();
+                    });
                 });
             });
 
-            it("should allow overriding disposeMethod globally", function() {
+            it("should allow overriding disposeMethod globally", function(done) {
                 var mod, called, context,
                     existing = ko.bindingHandlers.module.disposeMethod,
                     observable = ko.observable("static-no-initialize");
@@ -655,17 +713,19 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                         called = true;
                         context = this;
                     };
-                });
 
-                updateObservable(observable, null, function() {
-                    expect(called).toBeTruthy();
-                    expect(context).toEqual(mod);
-                    delete mod.myDisposeMethod;
-                    ko.bindingHandlers.module.disposeMethod = existing;
+                    updateObservable(observable, null, function() {
+                        expect(called).toBeTruthy();
+                        expect(context).toEqual(mod);
+                        delete mod.myDisposeMethod;
+                        ko.bindingHandlers.module.disposeMethod = existing;
+
+                        done();
+                    });
                 });
             });
 
-            it("should allow overriding disposeMethod in binding", function() {
+            it("should allow overriding disposeMethod in binding", function(done) {
                 var mod, called, context,
                     observable = ko.observable("static-no-initialize");
 
@@ -676,16 +736,18 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                         called = true;
                         context = this;
                     };
-                });
 
-                updateObservable(observable, null, function() {
-                    expect(called).toBeTruthy();
-                    expect(context).toEqual(mod);
-                    delete mod.cleanUp;
+                    updateObservable(observable, null, function() {
+                        expect(called).toBeTruthy();
+                        expect(context).toEqual(mod);
+                        delete mod.cleanUp;
+
+                        done();
+                    });
                 });
             });
 
-            it("should call the module's dispose when the element is removed", function() {
+            it("should call the module's dispose when the element is removed", function(done) {
                 var mod, called, context,
                     observable = ko.observable("static-no-initialize");
 
@@ -702,8 +764,10 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                     expect(called).toBeTruthy();
                     expect(context).toEqual(mod);
                     delete mod.dispose;
+
+                    done();
                 });
             });
-        })
+        });
     });
 });
