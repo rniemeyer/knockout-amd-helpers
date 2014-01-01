@@ -17,7 +17,7 @@
 
     </div>
 
-    <footer class="row" data-bind="template: 'footer'"></footer>
+    <footer class="row" data-bind="template: { name: 'footer', afterRender: function() { console.log('after', arguments); } }"></footer>
 
     <script data-main="main-require" src="../ext/require/require.js"></script>
 </body>

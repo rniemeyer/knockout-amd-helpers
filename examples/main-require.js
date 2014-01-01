@@ -1,6 +1,6 @@
 require.config({
     paths: {
-        "knockout": "../ext/knockout-2.2.1.debug",
+        "knockout": "../ext/knockout-3.0.0",
         "knockout-amd-helpers": "../build/knockout-amd-helpers",
         "text": "../ext/require/text"
     }

@@ -1,6 +1,6 @@
 curl({
     paths: {
-        "knockout": "../ext/knockout-2.2.1",
+        "knockout": "../ext/knockout-3.0.0",
         "knockout-amd-helpers": "../build/knockout-amd-helpers.min"
     },
     pluginPath: "../ext/curl/plugins"

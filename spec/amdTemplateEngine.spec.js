@@ -16,6 +16,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
 
                 sandbox.appendChild(container);
 
+                ko.cleanNode(sandbox);
                 ko.applyBindings(data, sandbox);
             });
 

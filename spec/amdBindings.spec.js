@@ -28,6 +28,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
 
                 sandbox.appendChild(container);
 
+                ko.cleanNode(sandbox);
                 ko.applyBindings(data, sandbox);
             });
 
@@ -589,7 +590,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             it("should return the current module", function() {
                 var observable = ko.observable();
                 applyBindings("module: 'static-no-initialize'", {}, null, function() {
-                    var context = ko.contextFor(container);
+                    var context = ko.contextFor(container.firstChild);
                     expect(context.$module.first()).toEqual("Bob");
                 });
             });
@@ -625,7 +626,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
 
             it("should call \"dispose\" by default", function() {
                 applyBindings("module: { name: test }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
-                    mod = ko.contextFor(container).$module;
+                    mod = ko.contextFor(container.firstChild).$module;
 
                     mod.dispose = function() {
                         called = true;
@@ -648,7 +649,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                 ko.bindingHandlers.module.disposeMethod = "myDisposeMethod";
 
                 applyBindings("module: { name: test }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
-                    mod = ko.contextFor(container).$module;
+                    mod = ko.contextFor(container.firstChild).$module;
 
                     mod.myDisposeMethod = function() {
                         called = true;
@@ -669,7 +670,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                     observable = ko.observable("static-no-initialize");
 
                 applyBindings("module: { name: test, disposeMethod: 'cleanUp' }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
-                    mod = ko.contextFor(container).$module;
+                    mod = ko.contextFor(container.firstChild).$module;
 
                     mod.cleanUp = function() {
                         called = true;
@@ -689,7 +690,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                     observable = ko.observable("static-no-initialize");
 
                 applyBindings("module: { name: test }", { test: observable }, "<span data-bind='text: $module.last'></span>", function() {
-                    mod = ko.contextFor(container).$module;
+                    mod = ko.contextFor(container.firstChild).$module;
 
                     mod.dispose = function() {
                         called = true;
