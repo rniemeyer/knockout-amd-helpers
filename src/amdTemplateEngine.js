@@ -2,6 +2,7 @@
 (function(ko, require) {
     //get a new native template engine to start with
     var engine = new ko.nativeTemplateEngine(),
+        existingRenderTemplate = engine.renderTemplate,
         sources = {};
 
     engine.defaultPath = "templates";
@@ -13,12 +14,17 @@
         this.key = key;
         this.template = ko.observable(" "); //content has to be non-falsey to start with
         this.requested = false;
+        this.retrieved = false;
     };
 
     ko.templateSources.requireTemplate.prototype.text = function(value) {
         //when the template is retrieved, check if we need to load it
         if (!this.requested && this.key) {
-            require([engine.defaultRequireTextPluginName + "!" + addTrailingSlash(engine.defaultPath) + this.key + engine.defaultSuffix], this.template);
+            require([engine.defaultRequireTextPluginName + "!" + addTrailingSlash(engine.defaultPath) + this.key + engine.defaultSuffix], function(templateContent) {
+                this.retrieved = true;
+                this.template(templateContent);
+            }.bind(this));
+
             this.requested = true;
         }
 
@@ -58,6 +64,23 @@
         else if (template && (template.nodeType === 1 || template.nodeType === 8)) {
             return new ko.templateSources.anonymousTemplate(template);
         }
+    };
+
+    //override renderTemplate to properly handle afterRender prior to template being available
+    engine.renderTemplate = function(template, bindingContext, options, templateDocument) {
+        var templateSource = engine.makeTemplateSource(template, templateDocument),
+            existingAfterRender = options && options.afterRender;
+
+        //wrap the existing afterRender, so it is not called until template is actuall retrieved
+        if (typeof existingAfterRender === "function" && templateSource instanceof ko.templateSources.requireTemplate) {
+            options.afterRender = function() {
+                if (templateSource.retrieved) {
+                    existingAfterRender.apply(this, arguments);
+                }
+            };
+        }
+
+        return engine.renderTemplateSource(templateSource, bindingContext, options);
     };
 
     //expose the template engine at least to be able to customize the path/suffix/plugin at run-time
