@@ -95,7 +95,7 @@ If the module returns an object (rather than a constructor function), then the b
 When a module is swapped out, you can specify a custom function name to call to do any necessary clean up.
 
 ####afterRender
-The `afterRender` function will be passed on the the template binding, if specified.
+The `afterRender` function will be passed on to the template binding, if specified.
 
 ###module binding global options
 There are a couple of options that can be set globally for convenience.
