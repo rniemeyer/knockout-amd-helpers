@@ -469,6 +469,22 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                     });
                 });
 
+                it("should call afterRender, even when initial value was null", function(done) {
+                    var observable = ko.observable(null),
+                        afterRender = jasmine.createSpy("afterRender");
+
+                    applyBindings("module: test", { test: observable }, null, function() {
+                        updateObservable(observable, {
+                            name: "static-no-initialize",
+                            afterRender: afterRender
+                        }, function() {
+                            expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
+                            expect(afterRender.calls.count()).toEqual(1);
+                            done();
+                        });
+                    });
+                });
+
                 describe("observable is empty", function() {
                     it("should not error out initially", function(done) {
                         var observable = ko.observable();

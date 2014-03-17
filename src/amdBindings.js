@@ -9,18 +9,16 @@ ko.bindingHandlers.module = {
             disposeMethod = ko.bindingHandlers.module.disposeMethod;
 
         //build up a proper template binding object
-        if (options && typeof options === "object") {
-            templateBinding.templateEngine = options.templateEngine;
+        templateBinding.templateEngine = options && options.templateEngine;
 
-            //afterRender could be different for each module, create a wrapper
-            templateBinding.afterRender = function() {
-                var options = unwrap(valueAccessor());
+        //afterRender could be different for each module, create a wrapper
+        templateBinding.afterRender = function() {
+            var options = unwrap(valueAccessor());
 
-                if (options && typeof options.afterRender === "function") {
-                    options.afterRender.apply(this, arguments);
-                }
-            };
-        }
+            if (options && typeof options.afterRender === "function") {
+                options.afterRender.apply(this, arguments);
+            }
+        };
 
         //if this is not an anonymous template, then build a function to properly return the template name
         if (!isAnonymous(element)) {
