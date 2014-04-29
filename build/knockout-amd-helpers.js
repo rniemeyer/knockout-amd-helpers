@@ -220,8 +220,25 @@ if (ko.virtualElements) {
 
     //override renderTemplate to properly handle afterRender prior to template being available
     engine.renderTemplate = function(template, bindingContext, options, templateDocument) {
-        var templateSource = engine.makeTemplateSource(template, templateDocument),
+        var templateSource,
             existingAfterRender = options && options.afterRender;
+
+        //if a module is being loaded, and that module as a `template` property (of type `string` or `function`) - use that property as the source of the template.
+        if (bindingContext.$module && bindingContext.$module.template && (typeof bindingContext.$module.template === 'string' || typeof bindingContext.$module.template === 'function')) {
+            if (typeof bindingContext.$module.template === 'string') {
+                templateSource = {
+                    'text': function() {
+                        return bindingContext.$module.template;
+                    }
+                };
+            } else {
+                templateSource = {
+                    'text': bindingContext.$module.template
+                };
+            }
+        } else {
+            templateSource = engine.makeTemplateSource(template, templateDocument);
+        }
 
         //wrap the existing afterRender, so it is not called until template is actuall retrieved
         if (typeof existingAfterRender === "function" && templateSource instanceof ko.templateSources.requireTemplate && !templateSource.retrieved) {
@@ -242,5 +259,6 @@ if (ko.virtualElements) {
     ko.setTemplateEngine(engine);
 
 })(ko, require);
+
 
 });
