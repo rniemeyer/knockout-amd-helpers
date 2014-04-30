@@ -4,11 +4,11 @@
 
 This plugin is designed to be a lightweight and flexible solution to working with AMD modules in Knockout.js. It provides two key features:
 
-1- Augments the default template engine to allow it to load **external templates** using the AMD loader's text plugin. This lets you create your templates in individual HTML files and pull them in as needed by name (ideally in production the templates are included in your optimized file).
+1. Augments the default template engine to allow it to load **external templates** using the AMD loader's text plugin. This lets you create your templates in individual HTML files and pull them in as needed by name (ideally in production the templates are included in your optimized file).
 
-2- Creates a `module` binding that provides a flexible way to load data from an AMD module and either bind it against a template or against an anonymous/inline template.
+2. Creates a `module` binding that provides a flexible way to load data from an AMD module and either bind it against an external template, an anonymous / inline template, or against a template defined within a property on the module itself.
 
-##template engine
+## Template Engine
 
 When this plugin is loaded it overrides the default template engine with a version that retains all of the normal functionality, but can also load external templates by using the AMD loader's text plugin.
 
@@ -24,7 +24,7 @@ These defaults can be overridden by setting properties on `ko.amdTemplateEngine`
     ko.amdTemplateEngine.defaultSuffix = ".template.html";
     ko.amdTemplateEngine.defaultRequireTextPluginName = "text";
     
-##module binding
+## Module Binding
 
 This plugin also creates a `module` binding that provides a number of ways to bind directly against an AMD module. The binding accepts a number of options and tries to make smart choices by default.
 
@@ -77,48 +77,128 @@ The `module` binding supports binding against an observable or passing an observ
 
 The `module` binding adds a `$module` context variable that can be bound against. This can be useful when you want to bind against the equivalent of `$root` for just your module. When modules are nested inside other modules, `$module` will always refer to the root of the current module.
 
-###module binding options
+## Module Binding - Inline Options
 
-####name
+#### name
+
 Provide the name of the module to load. The module will be loaded by combining the name with the value of `ko.bindingHandlers.module.baseDir` (defaults to empty). The name will also be used as the template, if the `template` option is not specified and the element does not have any child elements (inline template).
 
-####data
+```html
+<div data-bind="module: { name: 'my_module' }"></div>
+```
+
+#### data
+
 The `data` option is used to pass values into a constructor function or into the initializer function if the module returns an object directly. If an array is specified, then it will be applied as the arguments to the function (if you really want to pass an array as the first argument, then you would have to wrap it in an array like `[myarray]`).
 
-####template
+```html
+<div data-bind="module: { name: 'my_module', data: ['arg1', 'arg2'] }"></div>
+```
+
+#### template
+
 The `template` option provides the ability to override the template used for the module. In some cases, you may want to share a template across multiple modules or bind a module against multiple templates.
 
-####initializer
+```html
+<div data-bind="module: { name: 'my_module', template: 'my_template' }"></div>
+```
+
+#### templateProperty
+
+The `templateProperty` option provides the ability to specify a key that, if defined, will be used to check whether a given module has defined its own template. The result is a module that is fully self-contained (i.e. with no external templates). Take the following example:
+
+```html
+<div data-bind="module: { name: 'my_module', templateProperty: 'template' }"></div>
+```
+
+```
+define(['knockout'], function(ko) {
+
+	return {
+	
+		'template': "<div>I have my own template.</div>"
+
+	};
+
+});
+```
+
+#### initializer
+
 If the module returns an object (rather than a constructor function), then the binding will attempt to call an initializer function, if it exists. By default, this function is called `initialize`, but you can override the name of the function to call using this option or globally by setting `ko.bindingHandlers.module.initializer` to the name of the function that you want to use.
 
-####disposeMethod
+```html
+<div data-bind="module: { name: 'my_module', initializer: 'initialize' }"></div>
+```
+
+#### disposeMethod
+
 When a module is swapped out, you can specify a custom function name to call to do any necessary clean up.
 
-####afterRender
+```html
+<div data-bind="module: { name: 'my_module', disposeMethod: 'dispose' }"></div>
+```
+
+#### afterRender
+
 The `afterRender` function will be passed on to the template binding, if specified.
 
-###module binding global options
-There are a couple of options that can be set globally for convenience.
+```html
+<div data-bind="module: { name: 'my_module', afterRender: 'afterRender' }"></div>
+```
 
-####ko.bindingHandlers.module.baseDir (default: "")
+## Module Binding - Global Options
+
+There are a few options that can be set globally for convenience.
+
+#### ko.bindingHandlers.module.baseDir (default: "")
+
 The `baseDir` is used in building the path to use in the `require` statement. If your modules live in the `modules` directory, then you can specify it globally here.
 
-####ko.bindingHandlers.module.initializer (default: "initialize")
+#### ko.bindingHandlers.module.initializer (default: "initialize")
+
 This allows the ability to globally override the function that the `module` binding calls after loading an AMD module that does not return a constructor.
 
-####ko.bindingHandlers.module.disposeMethod (default: "dispose")
+#### ko.bindingHandlers.module.disposeMethod (default: "dispose")
+
 The dispose method name can be globally overriden. This function is optionally called when a module is being removed/swapped.
 
-##Dependencies
+#### ko.bindingHandlers.module.templateProperty (default: "")
+
+The `templateProperty` option can be globally set. If defined, when a module is loaded - if it has a property with the key specified here, the value of that property will be used as the template for the module. The result is a fully self-contained module (i.e. it has its own template, not an external one).
+
+## Dependencies
 
 * Knockout 2.0+
 
-##Examples
-The `examples` directory contains a sample using [require.js](http://requirejs.org/) and using [curl.js](https://github.com/cujojs/curl).
+## Examples
 
-##License
-MIT [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
+The `examples` directory contains a sample using [require.js](http://requirejs.org/) and using [curl.js](https://github.com/cujojs/curl). For your convenience, you can quickly spin up an Express instance that serves these files by running:
 
-     
+```
+$ node express
+```
 
- 
+## License
+
+The MIT License
+
+Copyright (c) 2010-2014
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
