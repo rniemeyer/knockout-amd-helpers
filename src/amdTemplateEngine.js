@@ -72,16 +72,16 @@
             existingAfterRender = options && options.afterRender;
 
         //if a module is being loaded, and that module as a `template` property (of type `string` or `function`) - use that property as the source of the template.
-        if (bindingContext.$module && bindingContext.$module.template && (typeof bindingContext.$module.template === 'string' || typeof bindingContext.$module.template === 'function')) {
-            if (typeof bindingContext.$module.template === 'string') {
+        if (options.templateProperty && bindingContext.$module && bindingContext.$module[options.templateProperty] && (typeof bindingContext.$module[options.templateProperty] === 'string' || typeof bindingContext.$module[options.templateProperty] === 'function')) {
+            if (typeof bindingContext.$module[options.templateProperty] === 'string') {
                 templateSource = {
                     'text': function() {
-                        return bindingContext.$module.template;
+                        return bindingContext.$module[options.templateProperty];
                     }
                 };
             } else {
                 templateSource = {
-                    'text': bindingContext.$module.template
+                    'text': bindingContext.$module[options.templateProperty]
                 };
             }
         } else {

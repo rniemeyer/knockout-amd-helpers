@@ -13,9 +13,13 @@
     <!-- ko module: 'navigation' -->
     <!-- /ko -->
 
-    <div class="row" data-bind="template: 'content'">
+    <div class="row" data-bind="template: 'content'"></div>
 
-    </div>
+    <!-- ko module: 'fruits' -->
+    <!-- /ko -->
+
+    <!-- ko module: { name: 'vegetables', templateProperty: 'tpl' } -->
+    <!-- /ko -->
 
     <footer class="row" data-bind="template: { name: 'footer', afterRender: function() { console.log('after', arguments); } }"></footer>
 

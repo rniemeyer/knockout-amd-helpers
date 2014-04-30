@@ -55,13 +55,16 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
         });
 
         ko.bindingHandlers.module.baseDir = "modules/";
+        ko.bindingHandlers.module.templateProperty = "template";
 
         it("should create the binding handler", function() {
             expect(ko.bindingHandlers.module).toBeDefined();
         });
 
         describe("just passing module name", function() {
+
             describe("module returns constructor", function() {
+
                 describe("creating instances", function() {
                     it("should create an instance", function(done) {
                         applyBindings("module: 'has-constructor'", {}, "<span></span>", function() {
@@ -85,6 +88,24 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                     it("should use the module name as the template, if none specified and no child elements", function(done) {
                         applyBindings("module: 'has-constructor'", {}, null, function() {
                             expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            done();
+                        });
+                    });
+                });
+
+                describe("using the template property", function() {
+                    it("should default to using the template located at the module's `template` property (if available)", function(done) {
+                        applyBindings("module: 'has-template'", {}, null, function() {
+                            expect(container.innerText).toEqual("I have my own template.");
+                            done();
+                        });
+                    });
+                });
+
+                describe("using a custom template property", function() {
+                    it("should use the inline `templateProperty` option to locate the template on the module (if specified)", function(done) {
+                        applyBindings("module: { name: 'has-custom-template', templateProperty: 'tpl' }", {}, null, function() {
+                            expect(container.innerText).toEqual("I have a custom template.");
                             done();
                         });
                     });

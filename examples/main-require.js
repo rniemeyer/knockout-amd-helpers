@@ -8,6 +8,7 @@ require.config({
 
 require(["knockout", "modules/app", "knockout-amd-helpers", "text"], function(ko, App) {
     ko.bindingHandlers.module.baseDir = "modules";
+    ko.bindingHandlers.module.templateProperty = "template";
 
     setTimeout(function() {
         ko.applyBindings(new App());

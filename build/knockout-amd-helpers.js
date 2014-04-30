@@ -42,10 +42,13 @@ ko.bindingHandlers.module = {
             options = unwrap(value),
             templateBinding = {},
             initializer = ko.bindingHandlers.module.initializer,
-            disposeMethod = ko.bindingHandlers.module.disposeMethod;
+            disposeMethod = ko.bindingHandlers.module.disposeMethod,
+            templateProperty = ko.bindingHandlers.module.templateProperty;
 
         //build up a proper template binding object
         templateBinding.templateEngine = options && options.templateEngine;
+
+        templateBinding.templateProperty = templateProperty;
 
         //afterRender could be different for each module, create a wrapper
         templateBinding.afterRender = function() {
@@ -96,9 +99,14 @@ ko.bindingHandlers.module = {
 
                 //observable could return an object that contains a name property
                 if (moduleName && typeof moduleName === "object") {
+
                     //initializer/dispose function name can be overridden
                     initializer = moduleName.initializer || initializer;
                     disposeMethod = moduleName.disposeMethod || disposeMethod;
+
+                    if (moduleName.templateProperty) {
+                        templateBinding.templateProperty = moduleName.templateProperty;
+                    }
 
                     //get the current copy of data to pass into module
                     initialArgs = [].concat(unwrap(moduleName.data));
@@ -141,7 +149,8 @@ ko.bindingHandlers.module = {
     },
     baseDir: "",
     initializer: "initialize",
-    disposeMethod: "dispose"
+    disposeMethod: "dispose",
+    templateProperty: ""
 };
 
 //support KO 2.0 that did not export ko.virtualElements
@@ -224,16 +233,16 @@ if (ko.virtualElements) {
             existingAfterRender = options && options.afterRender;
 
         //if a module is being loaded, and that module as a `template` property (of type `string` or `function`) - use that property as the source of the template.
-        if (bindingContext.$module && bindingContext.$module.template && (typeof bindingContext.$module.template === 'string' || typeof bindingContext.$module.template === 'function')) {
-            if (typeof bindingContext.$module.template === 'string') {
+        if (options.templateProperty && bindingContext.$module && bindingContext.$module[options.templateProperty] && (typeof bindingContext.$module[options.templateProperty] === 'string' || typeof bindingContext.$module[options.templateProperty] === 'function')) {
+            if (typeof bindingContext.$module[options.templateProperty] === 'string') {
                 templateSource = {
                     'text': function() {
-                        return bindingContext.$module.template;
+                        return bindingContext.$module[options.templateProperty];
                     }
                 };
             } else {
                 templateSource = {
-                    'text': bindingContext.$module.template
+                    'text': bindingContext.$module[options.templateProperty]
                 };
             }
         } else {

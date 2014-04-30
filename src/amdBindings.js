@@ -6,10 +6,13 @@ ko.bindingHandlers.module = {
             options = unwrap(value),
             templateBinding = {},
             initializer = ko.bindingHandlers.module.initializer,
-            disposeMethod = ko.bindingHandlers.module.disposeMethod;
+            disposeMethod = ko.bindingHandlers.module.disposeMethod,
+            templateProperty = ko.bindingHandlers.module.templateProperty;
 
         //build up a proper template binding object
         templateBinding.templateEngine = options && options.templateEngine;
+
+        templateBinding.templateProperty = templateProperty;
 
         //afterRender could be different for each module, create a wrapper
         templateBinding.afterRender = function() {
@@ -60,9 +63,14 @@ ko.bindingHandlers.module = {
 
                 //observable could return an object that contains a name property
                 if (moduleName && typeof moduleName === "object") {
+
                     //initializer/dispose function name can be overridden
                     initializer = moduleName.initializer || initializer;
                     disposeMethod = moduleName.disposeMethod || disposeMethod;
+
+                    if (moduleName.templateProperty) {
+                        templateBinding.templateProperty = moduleName.templateProperty;
+                    }
 
                     //get the current copy of data to pass into module
                     initialArgs = [].concat(unwrap(moduleName.data));
@@ -105,7 +113,8 @@ ko.bindingHandlers.module = {
     },
     baseDir: "",
     initializer: "initialize",
-    disposeMethod: "dispose"
+    disposeMethod: "dispose",
+    templateProperty: ""
 };
 
 //support KO 2.0 that did not export ko.virtualElements
