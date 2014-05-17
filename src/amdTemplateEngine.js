@@ -2,7 +2,6 @@
 (function(ko, require) {
     //get a new native template engine to start with
     var engine = new ko.nativeTemplateEngine(),
-        existingRenderTemplate = engine.renderTemplate,
         sources = {};
 
     engine.defaultPath = "templates";
@@ -69,26 +68,22 @@
     //override renderTemplate to properly handle afterRender prior to template being available
     engine.renderTemplate = function(template, bindingContext, options, templateDocument) {
         var templateSource,
-            existingAfterRender = options && options.afterRender;
+            existingAfterRender = options && options.afterRender,
+            localTemplate = options && options.templateProperty && bindingContext.$module && bindingContext.$module[options.templateProperty];
 
-        //if a module is being loaded, and that module as a `template` property (of type `string` or `function`) - use that property as the source of the template.
-        if (options.templateProperty && bindingContext.$module && bindingContext.$module[options.templateProperty] && (typeof bindingContext.$module[options.templateProperty] === 'string' || typeof bindingContext.$module[options.templateProperty] === 'function')) {
-            if (typeof bindingContext.$module[options.templateProperty] === 'string') {
-                templateSource = {
-                    'text': function() {
-                        return bindingContext.$module[options.templateProperty];
-                    }
-                };
-            } else {
-                templateSource = {
-                    'text': bindingContext.$module[options.templateProperty]
-                };
-            }
-        } else {
+        //if a module is being loaded, and that module has the template property (of type `string` or `function`) - use that as the source of the template.
+        if (localTemplate && (typeof localTemplate === "function" || typeof localTemplate === "string")) {
+            templateSource = {
+                text: function() {
+                    return typeof localTemplate === "function" ? localTemplate.call(bindingContext.$module) : localTemplate;
+                }
+            };
+        }
+        else {
             templateSource = engine.makeTemplateSource(template, templateDocument);
         }
 
-        //wrap the existing afterRender, so it is not called until template is actuall retrieved
+        //wrap the existing afterRender, so it is not called until template is actually retrieved
         if (typeof existingAfterRender === "function" && templateSource instanceof ko.templateSources.requireTemplate && !templateSource.retrieved) {
             options.afterRender = function() {
                 if (templateSource.retrieved) {

@@ -6,13 +6,13 @@ ko.bindingHandlers.module = {
             options = unwrap(value),
             templateBinding = {},
             initializer = ko.bindingHandlers.module.initializer,
-            disposeMethod = ko.bindingHandlers.module.disposeMethod,
-            templateProperty = ko.bindingHandlers.module.templateProperty;
+            disposeMethod = ko.bindingHandlers.module.disposeMethod;
 
         //build up a proper template binding object
         templateBinding.templateEngine = options && options.templateEngine;
 
-        templateBinding.templateProperty = templateProperty;
+        //allow binding template to a string on module (can override in binding)
+        templateBinding.templateProperty = ko.bindingHandlers.module.templateProperty;
 
         //afterRender could be different for each module, create a wrapper
         templateBinding.afterRender = function() {
@@ -67,10 +67,7 @@ ko.bindingHandlers.module = {
                     //initializer/dispose function name can be overridden
                     initializer = moduleName.initializer || initializer;
                     disposeMethod = moduleName.disposeMethod || disposeMethod;
-
-                    if (moduleName.templateProperty) {
-                        templateBinding.templateProperty = moduleName.templateProperty;
-                    }
+                    templateBinding.templateProperty = ko.unwrap(moduleName.templateProperty) || templateBinding.templateProperty;
 
                     //get the current copy of data to pass into module
                     initialArgs = [].concat(unwrap(moduleName.data));
@@ -112,8 +109,11 @@ ko.bindingHandlers.module = {
         return { controlsDescendantBindings: true };
     },
     baseDir: "",
+
     initializer: "initialize",
+
     disposeMethod: "dispose",
+
     templateProperty: ""
 };
 

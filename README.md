@@ -111,7 +111,7 @@ The `templateProperty` option provides the ability to specify a key that, if def
 <div data-bind="module: { name: 'my_module', templateProperty: 'template' }"></div>
 ```
 
-```
+```js
 define(['knockout'], function(ko) {
 
 	return {
@@ -165,7 +165,7 @@ The dispose method name can be globally overriden. This function is optionally c
 
 #### ko.bindingHandlers.module.templateProperty (default: "")
 
-The `templateProperty` option can be globally set. If defined, when a module is loaded - if it has a property with the key specified here, the value of that property will be used as the template for the module. The result is a fully self-contained module (i.e. it has its own template, not an external one).
+The `templateProperty` option can be globally set. If defined, when a module is loaded - if it has a property with the key specified here (where the value is a string or function), the value of that property will be used as the template for the module. The result is a fully self-contained module (i.e. it has its own template, not an external one).
 
 ## Dependencies
 
@@ -181,24 +181,4 @@ $ node express
 
 ## License
 
-The MIT License
-
-Copyright (c) 2010-2014
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+MIT license - http://www.opensource.org/licenses/mit-license.php

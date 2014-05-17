@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.6.2 | (c) 2014 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.6.3 | (c) 2014 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -42,13 +42,13 @@ ko.bindingHandlers.module = {
             options = unwrap(value),
             templateBinding = {},
             initializer = ko.bindingHandlers.module.initializer,
-            disposeMethod = ko.bindingHandlers.module.disposeMethod,
-            templateProperty = ko.bindingHandlers.module.templateProperty;
+            disposeMethod = ko.bindingHandlers.module.disposeMethod;
 
         //build up a proper template binding object
         templateBinding.templateEngine = options && options.templateEngine;
 
-        templateBinding.templateProperty = templateProperty;
+        //allow binding template to a string on module (can override in binding)
+        templateBinding.templateProperty = ko.bindingHandlers.module.templateProperty;
 
         //afterRender could be different for each module, create a wrapper
         templateBinding.afterRender = function() {
@@ -103,10 +103,7 @@ ko.bindingHandlers.module = {
                     //initializer/dispose function name can be overridden
                     initializer = moduleName.initializer || initializer;
                     disposeMethod = moduleName.disposeMethod || disposeMethod;
-
-                    if (moduleName.templateProperty) {
-                        templateBinding.templateProperty = moduleName.templateProperty;
-                    }
+                    templateBinding.templateProperty = ko.unwrap(moduleName.templateProperty) || templateBinding.templateProperty;
 
                     //get the current copy of data to pass into module
                     initialArgs = [].concat(unwrap(moduleName.data));
@@ -148,8 +145,11 @@ ko.bindingHandlers.module = {
         return { controlsDescendantBindings: true };
     },
     baseDir: "",
+
     initializer: "initialize",
+
     disposeMethod: "dispose",
+
     templateProperty: ""
 };
 
@@ -163,7 +163,6 @@ if (ko.virtualElements) {
 (function(ko, require) {
     //get a new native template engine to start with
     var engine = new ko.nativeTemplateEngine(),
-        existingRenderTemplate = engine.renderTemplate,
         sources = {};
 
     engine.defaultPath = "templates";
@@ -230,26 +229,22 @@ if (ko.virtualElements) {
     //override renderTemplate to properly handle afterRender prior to template being available
     engine.renderTemplate = function(template, bindingContext, options, templateDocument) {
         var templateSource,
-            existingAfterRender = options && options.afterRender;
+            existingAfterRender = options && options.afterRender,
+            localTemplate = options && options.templateProperty && bindingContext.$module && bindingContext.$module[options.templateProperty];
 
-        //if a module is being loaded, and that module as a `template` property (of type `string` or `function`) - use that property as the source of the template.
-        if (options.templateProperty && bindingContext.$module && bindingContext.$module[options.templateProperty] && (typeof bindingContext.$module[options.templateProperty] === 'string' || typeof bindingContext.$module[options.templateProperty] === 'function')) {
-            if (typeof bindingContext.$module[options.templateProperty] === 'string') {
-                templateSource = {
-                    'text': function() {
-                        return bindingContext.$module[options.templateProperty];
-                    }
-                };
-            } else {
-                templateSource = {
-                    'text': bindingContext.$module[options.templateProperty]
-                };
-            }
-        } else {
+        //if a module is being loaded, and that module has the template property (of type `string` or `function`) - use that as the source of the template.
+        if (localTemplate && (typeof localTemplate === "function" || typeof localTemplate === "string")) {
+            templateSource = {
+                text: function() {
+                    return typeof localTemplate === "function" ? localTemplate.call(bindingContext.$module) : localTemplate;
+                }
+            };
+        }
+        else {
             templateSource = engine.makeTemplateSource(template, templateDocument);
         }
 
-        //wrap the existing afterRender, so it is not called until template is actuall retrieved
+        //wrap the existing afterRender, so it is not called until template is actually retrieved
         if (typeof existingAfterRender === "function" && templateSource instanceof ko.templateSources.requireTemplate && !templateSource.retrieved) {
             options.afterRender = function() {
                 if (templateSource.retrieved) {

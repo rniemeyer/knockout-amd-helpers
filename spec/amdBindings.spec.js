@@ -28,6 +28,7 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             sandbox.appendChild(container);
 
             ko.cleanNode(sandbox);
+
             ko.applyBindings(data, sandbox);
 
             setTimeout(callback, 50);
@@ -52,10 +53,11 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             if (sandbox.firstChild) {
                 ko.removeNode(sandbox.firstChild);
             }
+
+            ko.bindingHandlers.module.templateProperty = "";
         });
 
         ko.bindingHandlers.module.baseDir = "modules/";
-        ko.bindingHandlers.module.templateProperty = "template";
 
         it("should create the binding handler", function() {
             expect(ko.bindingHandlers.module).toBeDefined();
@@ -88,24 +90,6 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                     it("should use the module name as the template, if none specified and no child elements", function(done) {
                         applyBindings("module: 'has-constructor'", {}, null, function() {
                             expect(container.innerText).toEqual("has-constructor: Ted Jones");
-                            done();
-                        });
-                    });
-                });
-
-                describe("using the template property", function() {
-                    it("should default to using the template located at the module's `template` property (if available)", function(done) {
-                        applyBindings("module: 'has-template'", {}, null, function() {
-                            expect(container.innerText).toEqual("I have my own template.");
-                            done();
-                        });
-                    });
-                });
-
-                describe("using a custom template property", function() {
-                    it("should use the inline `templateProperty` option to locate the template on the module (if specified)", function(done) {
-                        applyBindings("module: { name: 'has-custom-template', templateProperty: 'tpl' }", {}, null, function() {
-                            expect(container.innerText).toEqual("I have a custom template.");
                             done();
                         });
                     });
@@ -188,6 +172,62 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                     it("should use the module name as the template, if none specified and no child elements", function(done) {
                         applyBindings("module: 'static-no-initialize'", {}, null, function() {
                             expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
+                            done();
+                        });
+                    });
+                });
+
+                describe("using the template property", function() {
+                    it("should default to using the template located at the module's `template` property (string)", function(done) {
+                        ko.bindingHandlers.module.templateProperty = "template";
+                        applyBindings("module: 'has-template'", {}, null, function() {
+                            expect(container.innerText).toEqual("I have my own template.");
+                            done();
+                        });
+                    });
+
+                    it("should default to using the template located at the module's `template` property (function)", function(done) {
+                        ko.bindingHandlers.module.templateProperty = "templateFunction";
+                        applyBindings("module: 'has-template'", {}, null, function() {
+                            expect(container.innerText).toEqual("I have my own template.(from a function)");
+                            done();
+                        });
+                    });
+                });
+
+                describe("using a custom template property", function() {
+                    it("should use the inline `templateProperty` option to locate the template on the module (string)", function(done) {
+                        applyBindings("module: { name: 'has-custom-template', templateProperty: 'tpl' }", {}, null, function() {
+                            expect(container.innerText).toEqual("I have a custom template.");
+                            done();
+                        });
+                    });
+
+                    it("should use the inline `templateProperty` option to locate the template on the module (function)", function(done) {
+                        applyBindings("module: { name: 'has-custom-template', templateProperty: 'tplFunction' }", {}, null, function() {
+                            expect(container.innerText).toEqual("I have a custom template.(from a function)");
+                            done();
+                        });
+                    });
+
+                    it("should support using an inline `templateProperty` option that is observable to locate the template on the module", function(done) {
+                        var prop = ko.observable("tpl");
+
+                        applyBindings("module: { name: 'has-custom-template', templateProperty: prop }", { prop: prop }, null, function() {
+                            expect(container.innerText).toEqual("I have a custom template.");
+
+                            //should update template when option is updated
+                            prop("tplFunction");
+
+                            expect(container.innerText).toEqual("I have a custom template.(from a function)");
+
+                            done();
+                        });
+                    });
+
+                    it("should ignore the inline `templateProperty` option when it does not exist on the module", function(done) {
+                        applyBindings("module: { name: 'has-constructor', templateProperty: 'someTemplate' }", {}, null, function() {
+                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
                             done();
                         });
                     });
