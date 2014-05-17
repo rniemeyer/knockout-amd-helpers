@@ -255,6 +255,18 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                     });
                 });
 
+                it("should respect observables accessed within the binding string", function(done) {
+                    var observable = ko.observable("no-initialize");
+                    applyBindings("module: 'static-' + test()", { test: observable }, null, function() {
+                        expect(container.innerText).toEqual("static-no-initialize: Bob Smith");
+
+                        updateObservable(observable, "with-initialize", function() {
+                            expect(container.innerText).toEqual("static-with-initialize: Jane Black");
+                            done();
+                        });
+                    });
+                });
+
                 describe("observable is empty", function() {
                     it("should not error out initially", function(done) {
                         var observable = ko.observable();

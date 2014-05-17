@@ -2,8 +2,7 @@
 ko.bindingHandlers.module = {
     init: function(element, valueAccessor, allBindingsAccessor, data, context) {
         var extendedContext, disposeModule,
-            value = valueAccessor(),
-            options = unwrap(value),
+            options = unwrap(valueAccessor()),
             templateBinding = {},
             initializer = ko.bindingHandlers.module.initializer,
             disposeMethod = ko.bindingHandlers.module.disposeMethod;
@@ -26,7 +25,7 @@ ko.bindingHandlers.module = {
         //if this is not an anonymous template, then build a function to properly return the template name
         if (!isAnonymous(element)) {
             templateBinding.name = function() {
-                var template = unwrap(value);
+                var template = unwrap(valueAccessor());
                 return ((template && typeof template === "object") ? unwrap(template.template || template.name) : template) || "";
             };
         }
@@ -59,7 +58,7 @@ ko.bindingHandlers.module = {
             read: function() {
                 //module name could be in an observable
                 var initialArgs,
-                    moduleName = unwrap(value);
+                    moduleName = unwrap(valueAccessor());
 
                 //observable could return an object that contains a name property
                 if (moduleName && typeof moduleName === "object") {
