@@ -1,15 +1,5 @@
-define([
-    'knockout'
-], function(ko) {
+define({
+    embeddedTemplate: "<div class='fruits large-12 columns'><p><ul data-bind='foreach: fruits'><li data-bind='html: $data'></li></ul></p></div>",
 
-    var fruits = {
-
-        'template': "<div class='fruits large-12 columns'><p><ul data-bind='foreach: fruits'><li data-bind='html: $data'></li></ul></p></div>",
-
-        'fruits': ['Orange', 'Pineapple', 'Strawberry', 'Mango', 'Grape']
-
-    };
-
-    return fruits;
-
+    fruits: ["Orange", "Pineapple", "Strawberry", "Mango", "Grape"]
 });

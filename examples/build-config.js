@@ -11,6 +11,8 @@
         "text!templates/navigation.tmpl.html",
         "modules/aside",
         "modules/navigation",
+        "modules/fruits",
+        "modules/vegetables",
         "modules/articles/one",
         "modules/articles/two",
         "modules/articles/three"

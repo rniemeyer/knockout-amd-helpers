@@ -1,4 +1,10 @@
 <div class="panel">
     <h5 data-bind="text: title"></h5>
     <p data-bind="text: description"></p>
+
+    <!-- ko module: 'fruits' -->
+    <!-- /ko -->
+
+    <!-- ko module: { name: 'vegetables', templateProperty: 'embeddedTpl' } -->
+    <!-- /ko -->
 </div>
