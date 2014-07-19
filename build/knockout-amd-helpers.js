@@ -2,7 +2,7 @@
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
-var require = window.require || window.curl,
+var require = window.requirejs || window.require || window.curl,
     unwrap = ko.utils.unwrapObservable,
     //call a constructor function with a variable number of arguments
     construct = function(Constructor, args) {
