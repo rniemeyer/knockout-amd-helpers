@@ -19,7 +19,11 @@ ko.bindingHandlers.module = {
 
             if (options && typeof options.afterRender === "function") {
                 options.afterRender.apply(this, arguments);
+            }else if (options && typeof options.afterRender === "string") {
+                options.afterRender = arguments[1][options.afterRender];
+                options.afterRender.apply(this, arguments);
             }
+            
         };
 
         //if this is not an anonymous template, then build a function to properly return the template name
