@@ -558,6 +558,34 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
                     });
                 });
 
+                it("should be able to pass a string for afterRender, which is called off of the module, if it exists", function(done) {
+                    var observable = ko.observable(null);
+
+                    applyBindings("module: test", { test: observable }, null, function() {
+                        updateObservable(observable, {
+                            name: "has-constructor",
+                            afterRender: "afterTest"
+                        }, function() {
+                            expect(container.innerText).toEqual("has-constructor: Theodore Jones");
+                            done();
+                        });
+                    });
+                });
+
+                it("should be able to pass a string for afterRender, which does not error, if it does not exist on the module", function(done) {
+                    var observable = ko.observable(null);
+
+                    applyBindings("module: test", { test: observable }, null, function() {
+                        updateObservable(observable, {
+                            name: "has-constructor",
+                            afterRender: "badAfterTest"
+                        }, function() {
+                            expect(container.innerText).toEqual("has-constructor: Ted Jones");
+                            done();
+                        });
+                    });
+                });
+
                 describe("observable is empty", function() {
                     it("should not error out initially", function(done) {
                         var observable = ko.observable();

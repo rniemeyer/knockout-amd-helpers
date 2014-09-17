@@ -14,16 +14,17 @@ ko.bindingHandlers.module = {
         templateBinding.templateProperty = ko.bindingHandlers.module.templateProperty;
 
         //afterRender could be different for each module, create a wrapper
-        templateBinding.afterRender = function() {
-            var options = unwrap(valueAccessor());
+        templateBinding.afterRender = function(nodes, data) {
+            var handler,
+                options = unwrap(valueAccessor());
 
-            if (options && typeof options.afterRender === "function") {
-                options.afterRender.apply(this, arguments);
-            }else if (options && typeof options.afterRender === "string") {
-                options.afterRender = arguments[1][options.afterRender];
-                options.afterRender.apply(this, arguments);
+            if (options && options.afterRender) {
+                handler = typeof options.afterRender === "string" ? data && data[options.afterRender] : options.afterRender;
+
+                if (typeof handler === "function") {
+                    handler.apply(this, arguments);
+                }
             }
-            
         };
 
         //if this is not an anonymous template, then build a function to properly return the template name

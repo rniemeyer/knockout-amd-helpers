@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.7.1 | (c) 2014 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.7.2 | (c) 2014 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -50,11 +50,16 @@ ko.bindingHandlers.module = {
         templateBinding.templateProperty = ko.bindingHandlers.module.templateProperty;
 
         //afterRender could be different for each module, create a wrapper
-        templateBinding.afterRender = function() {
-            var options = unwrap(valueAccessor());
+        templateBinding.afterRender = function(nodes, data) {
+            var handler,
+                options = unwrap(valueAccessor());
 
-            if (options && typeof options.afterRender === "function") {
-                options.afterRender.apply(this, arguments);
+            if (options && options.afterRender) {
+                handler = typeof options.afterRender === "string" ? data && data[options.afterRender] : options.afterRender;
+
+                if (typeof handler === "function") {
+                    handler.apply(this, arguments);
+                }
             }
         };
 
