@@ -141,7 +141,7 @@ When a module is swapped out, you can specify a custom function name to call to 
 
 #### afterRender
 
-The `afterRender` function will be passed on to the template binding, if specified.
+The `afterRender` function is passed on to the template binding. If a string is specified, then it will be used to find a method on the module itself. Otherwise, if a function reference is passed, then it will be used directly.
 
 ```html
 <div data-bind="module: { name: 'my_module', afterRender: 'afterRender' }"></div>
