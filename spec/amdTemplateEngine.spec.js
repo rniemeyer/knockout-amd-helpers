@@ -86,6 +86,25 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             });
         });
 
+        it("should call the afterRender function, even if the initial template was empty", function(done) {
+            var vm = {
+                templateName: ko.observable(""),
+                first: ko.observable("Jon"),
+                last: ko.observable("Black"),
+                rendered: jasmine.createSpy()
+            };
+
+            applyBindings("template: { name: templateName, afterRender: rendered }", vm, null, function() {
+                vm.templateName("fresh");
+
+                setTimeout(function() {
+                    expect(container.innerText).toEqual("fresh: Jon Black");
+                    expect(vm.rendered.calls.count()).toEqual(1);
+                    done();
+                }, 50);
+            });
+        });
+
         it("should still first use a template in a script tag", function(done) {
             var template = document.createElement("script");
             template.type = "text/html";

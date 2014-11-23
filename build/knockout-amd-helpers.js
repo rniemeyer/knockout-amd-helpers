@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.7.2 | (c) 2014 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.7.3 | (c) 2014 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -207,7 +207,7 @@ if (ko.virtualElements) {
     engine.makeTemplateSource = function(template, doc) {
         var el;
 
-        //if a name is specified, then use the
+        //if a name is specified
         if (typeof template === "string") {
             //if there is an element with this id and it is a script tag, then use it
             el = (doc || document).getElementById(template);
@@ -236,6 +236,11 @@ if (ko.virtualElements) {
             existingAfterRender = options && options.afterRender,
             localTemplate = options && options.templateProperty && bindingContext.$module && bindingContext.$module[options.templateProperty];
 
+        //restore the original afterRender, if necessary
+        if (existingAfterRender) {
+            existingAfterRender = options.afterRender = options.afterRender.original || options.afterRender;
+        }
+
         //if a module is being loaded, and that module has the template property (of type `string` or `function`) - use that as the source of the template.
         if (localTemplate && (typeof localTemplate === "function" || typeof localTemplate === "string")) {
             templateSource = {
@@ -255,6 +260,9 @@ if (ko.virtualElements) {
                     existingAfterRender.apply(this, arguments);
                 }
             };
+
+            //keep track of the original, so we don't double-wrap the function when template name changes
+            options.afterRender.original = existingAfterRender;
         }
 
         return engine.renderTemplateSource(templateSource, bindingContext, options);
