@@ -100,7 +100,7 @@
             options.afterRender.original = existingAfterRender;
         }
 
-        return engine.renderTemplateSource(templateSource, bindingContext, options);
+        return engine.renderTemplateSource(templateSource, bindingContext, options, templateDocument);
     };
 
     //expose the template engine at least to be able to customize the path/suffix/plugin at run-time
