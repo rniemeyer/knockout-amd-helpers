@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.7.3 | (c) 2014 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.7.4 | (c) 2015 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -265,7 +265,7 @@ if (ko.virtualElements) {
             options.afterRender.original = existingAfterRender;
         }
 
-        return engine.renderTemplateSource(templateSource, bindingContext, options);
+        return engine.renderTemplateSource(templateSource, bindingContext, options, templateDocument);
     };
 
     //expose the template engine at least to be able to customize the path/suffix/plugin at run-time

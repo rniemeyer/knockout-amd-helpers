@@ -1,6 +1,6 @@
 {
     "name": "knockout-amd-helpers",
-    "version": "0.7.3",
+    "version": "0.7.4",
     "main": "build/knockout-amd-helpers.min.js",
     "ignore": [
         "examples",
