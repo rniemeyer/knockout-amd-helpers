@@ -8,6 +8,8 @@ This plugin is designed to be a lightweight and flexible solution to working wit
 
 2. Creates a `module` binding that provides a flexible way to load data from an AMD module and either bind it against an external template, an anonymous / inline template, or against a template defined within a property on the module itself.
 
+Note: this library was originally designed to work with [require.js](http://requirejs.org/) or [curl.js](https://github.com/cujojs/curl). However, it is possible to use it with [webpack](https://webpack.github.io/). Look at the `examples/webpack` directory for further details. The `app.js` file shows how you can override the code used to actually load modules and templates to use with other technologies.
+
 ## Template Engine
 
 When this plugin is loaded it overrides the default template engine with a version that retains all of the normal functionality, but can also load external templates by using the AMD loader's text plugin.

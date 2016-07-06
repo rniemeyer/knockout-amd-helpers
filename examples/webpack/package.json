@@ -1,0 +1,15 @@
+{
+  "name": "knockout-amd-helpers-webpack-sample",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "html-loader": "^0.4.3",
+    "webpack": "^1.13.1"
+  }
+}

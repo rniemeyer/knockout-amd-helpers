@@ -34,6 +34,10 @@ var require = window.requirejs || window.require || window.curl,
         return false;
     };
 
+function defaultModuleLoader(moduleName, done) {
+	require([addTrailingSlash(ko.bindingHandlers.module.baseDir) + moduleName], done);
+}
+
 //an AMD helper binding that allows declarative module loading/binding
 ko.bindingHandlers.module = {
     init: function(element, valueAccessor, allBindingsAccessor, data, context) {
@@ -106,6 +110,7 @@ ko.bindingHandlers.module = {
             read: function() {
                 //module name could be in an observable
                 var initialArgs,
+					moduleLoader = ko.bindingHandlers.module.loader || defaultModuleLoader,
                     moduleName = unwrap(valueAccessor());
 
                 //observable could return an object that contains a name property
@@ -128,7 +133,7 @@ ko.bindingHandlers.module = {
 
                 //at this point, if we have a module name, then require it dynamically
                 if (moduleName) {
-                    require([addTrailingSlash(ko.bindingHandlers.module.baseDir) + moduleName], function(mod) {
+                    moduleLoader(moduleName, function(mod) {
                         //if it is a constructor function then create a new instance
                         if (typeof mod === "function") {
                             mod = construct(mod, initialArgs);
@@ -180,6 +185,10 @@ if (ko.virtualElements) {
     engine.defaultSuffix = ".tmpl.html";
     engine.defaultRequireTextPluginName = "text";
 
+	engine.loader = function(templateName, done) {
+        require([engine.defaultRequireTextPluginName + "!" + addTrailingSlash(engine.defaultPath) + templateName + engine.defaultSuffix], done);
+	};
+
     //create a template source that loads its template using the require.js text plugin
     ko.templateSources.requireTemplate = function(key) {
         this.key = key;
@@ -191,7 +200,7 @@ if (ko.virtualElements) {
     ko.templateSources.requireTemplate.prototype.text = function(value) {
         //when the template is retrieved, check if we need to load it
         if (!this.requested && this.key) {
-            require([engine.defaultRequireTextPluginName + "!" + addTrailingSlash(engine.defaultPath) + this.key + engine.defaultSuffix], function(templateContent) {
+            engine.loader(this.key, function(templateContent) {
                 this.retrieved = true;
                 this.template(templateContent);
             }.bind(this));
