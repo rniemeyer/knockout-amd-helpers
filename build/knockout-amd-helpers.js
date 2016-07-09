@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.7.4 | (c) 2015 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.7.4 | (c) 2016 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -37,7 +37,7 @@ var require = window.requirejs || window.require || window.curl,
 //an AMD helper binding that allows declarative module loading/binding
 ko.bindingHandlers.module = {
     init: function(element, valueAccessor, allBindingsAccessor, data, context) {
-        var extendedContext, disposeModule,
+        var extendedContext, extractedNodes, disposeModule,
             options = unwrap(valueAccessor()),
             templateBinding = {},
             initializer = ko.bindingHandlers.module.initializer,
@@ -63,6 +63,11 @@ ko.bindingHandlers.module = {
             }
         };
 
+		if (options && options.moveNodesToContext) {
+			extractedNodes = Array.prototype.slice.call(ko.virtualElements.childNodes(element));
+			ko.virtualElements.emptyNode(element);
+		}
+
         //if this is not an anonymous template, then build a function to properly return the template name
         if (!isAnonymous(element)) {
             templateBinding.name = function() {
@@ -76,7 +81,7 @@ ko.bindingHandlers.module = {
         templateBinding["if"] = templateBinding.data;
 
         //actually apply the template binding that we built. extend the context to include a $module property
-        ko.applyBindingsToNode(element, { template: templateBinding }, extendedContext = context.extend({ $module: null }));
+        ko.applyBindingsToNode(element, { template: templateBinding }, extendedContext = context.extend({ $module: null, $moduleTemplateNodes: extractedNodes }));
 
         //disposal function to use when a module is swapped or element is removed
         disposeModule = function() {
@@ -92,6 +97,8 @@ ko.bindingHandlers.module = {
                     templateBinding.data(null);
                 }
             }).dispose();
+
+			extractedNodes = null;
         };
 
         //now that we have bound our element using the template binding, pull the module and populate the observable.
