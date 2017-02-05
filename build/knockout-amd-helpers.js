@@ -1,4 +1,4 @@
-// knockout-amd-helpers 0.7.4 | (c) 2016 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-amd-helpers 0.7.4 | (c) 2017 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 define(["knockout"], function(ko) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
@@ -63,10 +63,10 @@ ko.bindingHandlers.module = {
             }
         };
 
-		if (options && options.moveNodesToContext) {
-			extractedNodes = Array.prototype.slice.call(ko.virtualElements.childNodes(element));
-			ko.virtualElements.emptyNode(element);
-		}
+        if (options && options.moveNodesToContext) {
+            extractedNodes = Array.prototype.slice.call(ko.virtualElements.childNodes(element));
+            ko.virtualElements.emptyNode(element);
+        }
 
         //if this is not an anonymous template, then build a function to properly return the template name
         if (!isAnonymous(element)) {
@@ -98,7 +98,7 @@ ko.bindingHandlers.module = {
                 }
             }).dispose();
 
-			extractedNodes = null;
+            extractedNodes = null;
         };
 
         //now that we have bound our element using the template binding, pull the module and populate the observable.

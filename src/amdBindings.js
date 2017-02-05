@@ -27,10 +27,10 @@ ko.bindingHandlers.module = {
             }
         };
 
-		if (options && options.moveNodesToContext) {
-			extractedNodes = Array.prototype.slice.call(ko.virtualElements.childNodes(element));
-			ko.virtualElements.emptyNode(element);
-		}
+        if (options && options.moveNodesToContext) {
+            extractedNodes = Array.prototype.slice.call(ko.virtualElements.childNodes(element));
+            ko.virtualElements.emptyNode(element);
+        }
 
         //if this is not an anonymous template, then build a function to properly return the template name
         if (!isAnonymous(element)) {
@@ -62,7 +62,7 @@ ko.bindingHandlers.module = {
                 }
             }).dispose();
 
-			extractedNodes = null;
+            extractedNodes = null;
         };
 
         //now that we have bound our element using the template binding, pull the module and populate the observable.

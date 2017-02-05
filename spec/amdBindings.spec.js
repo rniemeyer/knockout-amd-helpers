@@ -793,6 +793,16 @@ define(["knockout", "knockout-amd-helpers"], function(ko) {
             });
         });
 
+        describe("when using the moveNodesToContext option", function() {
+            it("should provide the nodes as the $moduleTemplateNodes context property", function(done) {
+                applyBindings("module: { name: 'static-no-initialize', template: 'with-module-nodes', moveNodesToContext: true }", {}, "<div data-bind='text: last'></div>", function() {
+                    console.log(container.outerHTML);
+                    expect(container.innerText).toEqual("BobWithModulesSmith")
+                    done();
+                });
+            });
+        });
+
         describe("when using the disposeMethod option", function() {
             var mod, called, context,
                 observable = ko.observable("static-no-initialize");

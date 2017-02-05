@@ -23,7 +23,7 @@ These defaults can be overridden by setting properties on `ko.amdTemplateEngine`
     ko.amdTemplateEngine.defaultPath = "your/path/to/templates";
     ko.amdTemplateEngine.defaultSuffix = ".template.html";
     ko.amdTemplateEngine.defaultRequireTextPluginName = "text";
-    
+
 ## Module Binding
 
 This plugin also creates a `module` binding that provides a number of ways to bind directly against an AMD module. The binding accepts a number of options and tries to make smart choices by default.
@@ -37,9 +37,9 @@ Once the `module` binding loads an AMD module, there are three scenarios for how
 2. **object returned** - If the module returns an object directly, then the binding will look for an initializer function (called `initialize` by default) and:
 
     a. if there is no initializer or the function does not return a value, then the data will be used directly.
-  
+
     b. if the initializer function returns a value, then it will be used as the data.
-  
+
 So, this allows the binding to either construct a new instance, use data directly, or call a function that returns data.
 
 ###Basic example (with inline template):
@@ -47,26 +47,26 @@ So, this allows the binding to either construct a new instance, use data directl
     <div data-bind="module: 'one'">
          <div data-bind="text: name"></div>
     </div>
-    
+
 In this example, it will load the module `one`, determine what data to bind against, and use the inline template.
 
 ###Basic example (named template - could be external)
 
     <div data-bind="module: 'one'"></div>
 
-In this example, it will load the module `one`, determine what data to bind against, and use `one` as the template, which is resolved by the template engine as described above. 
+In this example, it will load the module `one`, determine what data to bind against, and use `one` as the template, which is resolved by the template engine as described above.
 
 ###Example with options
 
     <div data-bind="module: { name: 'one', data: initialData }"></div>
 
 In this example, it will follow the same logic as the previous example, but it will pass the `initialData` to the module.
-    
-###Example with all options   
-    
+
+###Example with all options
+
     <div data-bind="module: { name: 'one', data: initialData, template: 'oneTmpl',
                               initializer: 'createItem', disposeMethod: 'clean', afterRender: myAfterRender }"></div>
-    
+
 This example includes a number of options options that can be passed to the `module` binding. In this case, the template is overriden to use `oneTmpl`, a custom initializer function is used, a custom disposal method is specified, and an `afterRender` function is passed on to the template binding.
 
 ###Dynamically binding against a module
@@ -115,7 +115,7 @@ The `templateProperty` option provides the ability to specify a key that, if def
 define(['knockout'], function(ko) {
 
 	return {
-	
+
 		'template': "<div>I have my own template.</div>"
 
 	};
@@ -146,6 +146,10 @@ The `afterRender` function is passed on to the template binding. If a string is 
 ```html
 <div data-bind="module: { name: 'my_module', afterRender: 'afterRender' }"></div>
 ```
+
+#### moveNodesToContext
+
+The `moveNodesToContext` option will extract the children of the module binding and provide them as the `$moduleTemplateNodes` context property. This allows a module to act as a "wrapper" for the supplied nodes. The module's template would want to render the children using the template binding ( `template: { nodes: $moduleTemplateNodes }` ).
 
 ## Module Binding - Global Options
 
