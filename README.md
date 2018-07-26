@@ -1,6 +1,6 @@
-#knockout-amd-helpers
+# knockout-amd-helpers
 
-##What is the point of this library?
+## What is the point of this library?
 
 This plugin is designed to be a lightweight and flexible solution to working with AMD modules in Knockout.js. It provides two key features:
 
@@ -30,7 +30,7 @@ These defaults can be overridden by setting properties on `ko.amdTemplateEngine`
 
 This plugin also creates a `module` binding that provides a number of ways to bind directly against an AMD module. The binding accepts a number of options and tries to make smart choices by default.
 
-###Choosing data to bind against
+### Choosing data to bind against
 
 Once the `module` binding loads an AMD module, there are three scenarios for how it determines the actual data to bind against:
 
@@ -44,7 +44,7 @@ Once the `module` binding loads an AMD module, there are three scenarios for how
 
 So, this allows the binding to either construct a new instance, use data directly, or call a function that returns data.
 
-###Basic example (with inline template):
+### Basic example (with inline template):
 
     <div data-bind="module: 'one'">
          <div data-bind="text: name"></div>
@@ -52,26 +52,26 @@ So, this allows the binding to either construct a new instance, use data directl
 
 In this example, it will load the module `one`, determine what data to bind against, and use the inline template.
 
-###Basic example (named template - could be external)
+### Basic example (named template - could be external)
 
     <div data-bind="module: 'one'"></div>
 
 In this example, it will load the module `one`, determine what data to bind against, and use `one` as the template, which is resolved by the template engine as described above.
 
-###Example with options
+### Example with options
 
     <div data-bind="module: { name: 'one', data: initialData }"></div>
 
 In this example, it will follow the same logic as the previous example, but it will pass the `initialData` to the module.
 
-###Example with all options
+### Example with all options
 
     <div data-bind="module: { name: 'one', data: initialData, template: 'oneTmpl',
                               initializer: 'createItem', disposeMethod: 'clean', afterRender: myAfterRender }"></div>
 
 This example includes a number of options options that can be passed to the `module` binding. In this case, the template is overriden to use `oneTmpl`, a custom initializer function is used, a custom disposal method is specified, and an `afterRender` function is passed on to the template binding.
 
-###Dynamically binding against a module
+### Dynamically binding against a module
 
 The `module` binding supports binding against an observable or passing an observable for the `name`, `template` and `data` options. The content will be appropriately updated based on the new values. This allows you to dynamically bind an area to a module that is updated as the user interacts with your site.
 
