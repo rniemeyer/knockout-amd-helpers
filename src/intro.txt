@@ -1,1 +1,1 @@
-define(["knockout"], function(ko) {
+define(["knockout", "require"], function(ko, require) {

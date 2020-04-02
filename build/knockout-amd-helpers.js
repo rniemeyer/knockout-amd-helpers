@@ -1,9 +1,8 @@
-// knockout-amd-helpers 1.0.0 | (c) 2017 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
-define(["knockout"], function(ko) {
+// knockout-amd-helpers 1.0.0 | (c) 2020 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+define(["knockout", "require"], function(ko, require) {
 
 //helper functions to support the binding and template engine (whole lib is wrapped in an IIFE)
-var require = window.requirejs || window.require || window.curl,
-    unwrap = ko.utils.unwrapObservable,
+var unwrap = ko.utils.unwrapObservable,
     //call a constructor function with a variable number of arguments
     construct = function(Constructor, args) {
         var instance,
