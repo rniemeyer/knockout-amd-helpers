@@ -1,6 +1,6 @@
 {
   "name": "knockout-amd-helpers",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Ryan Niemeyer",
   "homepage": "https://github.com/rniemeyer/knockout-sortable",
   "description": "Makes Knockout and AMD modules work better together",
